@@ -61,6 +61,7 @@ public class Statistics {
 	public static int efpdDeaths;
 	public static boolean efpdSurvived;      //the amulet was brought back
 	public static int efpdSurvivedTurn;
+	public static boolean efpdUrban;         //urban warfare mode
 	public static int efpdBossKills;         //every boss kill, respawned bosses included
 	public static int totalBossScore;
 	public static int[] questScores = new int[5];
@@ -119,6 +120,8 @@ public class Statistics {
 		efpdSurvived = false;
 		efpdSurvivedTurn = 0;
 		efpdBossKills = 0;
+		efpdUrban = false;
+		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.reset();
@@ -177,6 +180,7 @@ public class Statistics {
 	private static final String EFPD_SURVIVED	= "efpd_survived";
 	private static final String EFPD_SURV_TURN	= "efpd_survived_turn";
 	private static final String EFPD_BOSS_KILLS	= "efpd_boss_kills";
+	private static final String EFPD_URBAN		= "efpd_urban";
 	private static final String TOT_BOSS		= "tot_boss";
 	private static final String QUEST_SCORES	= "quest_scores";
 	private static final String TOT_QUEST		= "tot_quest";
@@ -235,6 +239,8 @@ public class Statistics {
 		bundle.put( EFPD_SURVIVED, efpdSurvived );
 		bundle.put( EFPD_SURV_TURN, efpdSurvivedTurn );
 		bundle.put( EFPD_BOSS_KILLS, efpdBossKills );
+		bundle.put( EFPD_URBAN, efpdUrban );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.storeInBundle( bundle );
@@ -303,6 +309,8 @@ public class Statistics {
 		efpdSurvived = bundle.getBoolean( EFPD_SURVIVED );
 		efpdSurvivedTurn = bundle.getInt( EFPD_SURV_TURN );
 		efpdBossKills = bundle.getInt( EFPD_BOSS_KILLS );
+		efpdUrban = bundle.getBoolean( EFPD_URBAN );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.restoreFromBundle( bundle );

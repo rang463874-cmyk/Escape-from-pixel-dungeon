@@ -630,11 +630,12 @@ public class GameScene extends PixelScene {
 		if (InterlevelScene.mode != InterlevelScene.Mode.NONE) {
 			if (Dungeon.depth == Statistics.deepestFloor
 					&& (InterlevelScene.mode == InterlevelScene.Mode.DESCEND || InterlevelScene.mode == InterlevelScene.Mode.FALL)) {
-				if (!OpenWorld.onBase()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
+				if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
 				Sample.INSTANCE.play(Assets.Sounds.DESCEND);
 
 				//EFPD: remind the player about the stash at the start of a raid
-				if (!OpenWorld.isActive() && Stash.canWithdraw() && !Stash.isEmpty()){
+				if (!OpenWorld.isActive() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()
+						&& Stash.canWithdraw() && !Stash.isEmpty()){
 					GLog.p(Messages.get(Stash.class, "hint"));
 				}
 				
@@ -666,7 +667,7 @@ public class GameScene extends PixelScene {
 				GLog.h(Messages.get(this, "warp"));
 			} else if (InterlevelScene.mode == InterlevelScene.Mode.RESURRECT) {
 				GLog.h(Messages.get(this, "resurrect"), Dungeon.depth);
-			} else if (!OpenWorld.onBase()) {
+			} else if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()) {
 				GLog.h(Messages.get(this, "return"), Dungeon.depth);
 			}
 
@@ -753,6 +754,14 @@ public class GameScene extends PixelScene {
 				GLog.p(Messages.get(OpenWorld.class, "at_base"));
 				//EFPD: quest givers who joined move into town
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.populateBase();
+			}
+			//EFPD: urban warfare arrival messages
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.outdoors()){
+				if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw()){
+					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "start"));
+				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.consumeZoneArrival()){
+					GLog.w(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "new_zone", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));
+				}
 			}
 			//EFPD: arriving on a floor that has regrown
 			if (com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.consumeNotice()){

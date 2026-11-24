@@ -629,7 +629,8 @@ public class InterlevelScene extends PixelScene {
 			//When debugging, we may start a game at a later depth to quickly test something
 			// if this happens, the games quickly generates all prior levels on branch 0 first,
 			// which ensures levelgen consistency with a regular game that was played to that depth.
-			if (DeviceCompat.isDebug()){
+			//EFPD: not for the mod's own worlds (open world base, urban city), they don't follow branch 0
+			if (DeviceCompat.isDebug() && Dungeon.branch == 0){
 				int trueDepth = Dungeon.depth;
 				int trueBranch = Dungeon.branch;
 				for (int i = 1; i < trueDepth + (trueBranch == 0 ? 0 : 1); i++){

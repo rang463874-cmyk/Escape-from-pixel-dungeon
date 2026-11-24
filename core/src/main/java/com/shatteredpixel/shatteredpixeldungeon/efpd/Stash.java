@@ -189,6 +189,10 @@ public class Stash {
 		if (Statistics.efpdInHideout) return true;
 		//open world: only in the base town
 		if (OpenWorld.isActive()) return OpenWorld.onBase();
+		//urban warfare: only on the starting plaza, before going anywhere
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()){
+			return com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw();
+		}
 		return Dungeon.depth == 1 && Dungeon.branch == 0 && Statistics.deepestFloor <= 1;
 	}
 

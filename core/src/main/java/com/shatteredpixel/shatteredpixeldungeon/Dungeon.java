@@ -270,6 +270,11 @@ public class Dungeon {
 			Statistics.efpdOpenWorld = true;
 			depth = OpenWorld.BASE_DEPTH;
 			branch = OpenWorld.BASE_BRANCH;
+		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode){
+			//EFPD: urban warfare games start in the middle of the first district
+			Statistics.efpdUrban = true;
+			depth = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS[0];
+			branch = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH;
 		}
 		generatedLevels.clear();
 
@@ -397,6 +402,12 @@ public class Dungeon {
 		} else if (branch == OpenWorld.BASE_BRANCH) {
 			//EFPD: open world base town
 			level = new BaseLevel();
+		} else if (branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH) {
+			//EFPD: urban warfare district
+			level = new com.shatteredpixel.shatteredpixeldungeon.efpd.urban.UrbanLevel();
+		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isFloorBranch( branch )) {
+			//EFPD: a floor of a city building
+			level = new com.shatteredpixel.shatteredpixeldungeon.efpd.urban.BuildingLevel();
 		} else {
 			level = new DeadEndLevel();
 		}
