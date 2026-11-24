@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.potions;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Hemorrhage;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -53,6 +55,10 @@ public class PotionOfHealing extends Potion {
 		identify();
 		cure( hero );
 		heal( hero );
+		//EFPD: a potion of healing also treats every injury and stops wound bleeding
+		Injuries injuries = hero.buff( Injuries.class );
+		if (injuries != null) injuries.healAll();
+		Buff.detach( hero, Hemorrhage.class );
 	}
 
 	public static void heal( Char ch ){

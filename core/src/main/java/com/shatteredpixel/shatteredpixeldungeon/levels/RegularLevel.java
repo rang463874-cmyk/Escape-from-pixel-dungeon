@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.MedicalSupplies;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -383,6 +384,11 @@ public abstract class RegularLevel extends Level {
 			nItems += 2;
 		}
 		
+		//EFPD: medical supplies on every regular floor
+		for (Item med : MedicalSupplies.levelLoot()){
+			drop( med, randomDropCell() );
+		}
+
 		for (int i=0; i < nItems; i++) {
 
 			Item toDrop = Generator.random();

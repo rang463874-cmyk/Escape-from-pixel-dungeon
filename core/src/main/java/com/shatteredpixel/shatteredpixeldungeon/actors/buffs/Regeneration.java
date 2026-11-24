@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
@@ -82,7 +83,8 @@ public class Regeneration extends Buff {
 					delay /= SaltCube.healthRegenMultiplier();
 				}
 
-				partialRegen += 1f / delay;
+				//EFPD: torso injuries slow or stop natural regeneration
+				partialRegen += Injuries.regenMultiplier(target) / delay;
 
 				if (partialRegen >= 1) {
 					target.HP += (int)partialRegen;

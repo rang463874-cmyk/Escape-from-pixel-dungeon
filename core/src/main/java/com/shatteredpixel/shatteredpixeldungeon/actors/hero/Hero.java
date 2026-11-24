@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Encumbrance;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -566,6 +567,9 @@ public class Hero extends Char {
 			accuracy *= 1.50f;
 		}
 		
+		//EFPD: head and arm injuries reduce accuracy
+		accuracy *= Injuries.accuracyMultiplier(this);
+
 		if (!RingOfForce.fightingUnarmed(this)) {
 			return Math.max(1, Math.round(attackSkill * accuracy * wep.accuracyFactor( this, target )));
 		} else {
@@ -609,6 +613,8 @@ public class Hero extends Char {
 
 		//EFPD: carrying too much makes the hero easier to hit
 		evasion *= Weight.evasionMultiplier(this);
+		//EFPD: foot injuries make the hero easier to hit
+		evasion *= Injuries.evasionMultiplier(this);
 
 		if (belongings.armor() != null) {
 			evasion = belongings.armor().evasionFactor(this, evasion);
@@ -709,6 +715,9 @@ public class Hero extends Char {
 			dmg = Math.round(dmg * (1.025f + .025f*pointsInTalent(Talent.WEAPON_RECHARGING)));
 		}
 
+		//EFPD: arm injuries reduce damage
+		dmg = Math.round(dmg * Injuries.damageMultiplier(this));
+
 		if (dmg < 0) dmg = 0;
 		return dmg;
 	}
@@ -748,8 +757,9 @@ public class Hero extends Char {
 
 		speed = AscensionChallenge.modifyHeroSpeed(speed);
 
-		//EFPD: carrying too much slows the hero down
+		//EFPD: carrying too much slows the hero down, so do leg injuries
 		speed *= Weight.speedMultiplier(this);
+		speed *= Injuries.speedMultiplier(this);
 		
 		return speed;
 		
@@ -1700,6 +1710,9 @@ public class Hero extends Char {
 		int effectiveDamage = preHP - postHP;
 
 		if (effectiveDamage <= 0) return;
+
+		//EFPD: enemy hits can injure body parts
+		Injuries.onHeroDamaged(this, effectiveDamage, src);
 
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);

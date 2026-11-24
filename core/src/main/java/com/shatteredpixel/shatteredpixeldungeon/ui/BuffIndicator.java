@@ -137,6 +137,7 @@ public class BuffIndicator extends Component {
 	public static final int SEAL_SHIELD = 84;
 	public static final int THROWN_WEP  = 85;
 	public static final int WEIGHT      = 86; //EFPD: encumbrance
+	public static final int INJURY      = 87; //EFPD: body part injuries
 
 	public static final int SIZE_SMALL  = 7;
 	public static final int SIZE_LARGE  = 16;

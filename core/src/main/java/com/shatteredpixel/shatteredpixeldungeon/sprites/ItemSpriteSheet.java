@@ -800,6 +800,17 @@ public class ItemSpriteSheet {
 		assignItemRect(VIAL,        12, 12);
 	}
 
+	//EFPD: medical supplies
+	private static final int EFPD_MEDICAL =                                 xy(13, 31); //3 slots
+	public static final int BANDAGE       = EFPD_MEDICAL+0;
+	public static final int SPLINT        = EFPD_MEDICAL+1;
+	public static final int FIRST_AID_KIT = EFPD_MEDICAL+2;
+	static{
+		assignItemRect(BANDAGE,       12, 11);
+		assignItemRect(SPLINT,        14, 14);
+		assignItemRect(FIRST_AID_KIT, 14, 12);
+	}
+
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;

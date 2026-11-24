@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.efpd;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Honeypot;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -97,6 +100,11 @@ public class Weight {
 		if (item instanceof SmallRation)    return 0.5f;
 		if (item.getClass() == Food.class)  return 1f;
 		if (item instanceof Food)           return 0.5f;
+
+		//medical supplies
+		if (item instanceof Bandage)        return 0.1f;
+		if (item instanceof Splint)         return 0.5f;
+		if (item instanceof FirstAidKit)    return 1f;
 
 		//misc
 		if (item instanceof Waterskin)      return 0.8f;
