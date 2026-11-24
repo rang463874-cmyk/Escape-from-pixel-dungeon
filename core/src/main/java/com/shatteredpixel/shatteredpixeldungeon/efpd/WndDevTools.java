@@ -239,6 +239,12 @@ public class WndDevTools extends Window {
 				GLog.w( Messages.get(WndDevTools.class, "injured") );
 			}
 		});
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.ARTIFACT_TOME), Messages.get(this, "allies") ){
+			@Override protected void give() {
+				for (Allies.Ally a : Allies.Ally.values()) Allies.join( a );
+				Allies.populateBase();
+			}
+		});
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.TOMB), Messages.get(this, "die") ){
 			@Override protected void give() {
 				hide();

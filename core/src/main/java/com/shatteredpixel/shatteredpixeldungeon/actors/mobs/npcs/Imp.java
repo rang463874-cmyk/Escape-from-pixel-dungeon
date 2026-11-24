@@ -384,6 +384,8 @@ public class Imp extends NPC {
 
 		public static void complete( int score ){
 			completed = true;
+			//EFPD: the imp joins the open world base
+			com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.join( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.Ally.IMP );
 
 			Imp.Quest.score = score;
 			Statistics.questScores[3] += score;

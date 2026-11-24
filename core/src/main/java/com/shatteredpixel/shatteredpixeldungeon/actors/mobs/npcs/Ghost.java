@@ -392,6 +392,8 @@ public class Ghost extends NPC {
 		}
 		
 		public static void complete() {
+			//EFPD: the ghost joins the open world base
+			com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.join( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.Ally.GHOST );
 			weapon = null;
 			armor = null;
 			

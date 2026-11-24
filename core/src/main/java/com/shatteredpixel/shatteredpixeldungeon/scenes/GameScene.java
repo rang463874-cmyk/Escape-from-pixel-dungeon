@@ -751,6 +751,8 @@ public class GameScene extends PixelScene {
 			//EFPD: arriving in the open world base town
 			if (OpenWorld.onBase()){
 				GLog.p(Messages.get(OpenWorld.class, "at_base"));
+				//EFPD: quest givers who joined move into town
+				com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.populateBase();
 			}
 			//EFPD: arriving on a floor that has regrown
 			if (com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.consumeNotice()){

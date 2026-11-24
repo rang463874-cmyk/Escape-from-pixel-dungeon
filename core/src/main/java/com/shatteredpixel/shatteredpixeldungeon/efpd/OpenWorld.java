@@ -155,8 +155,11 @@ public class OpenWorld {
 
 		CorpseBag bag = new CorpseBag();
 		bag.id = ++Statistics.efpdCorpseId;
-		bag.gold = Dungeon.gold;
-		Dungeon.gold = 0;
+		//the ghost ally keeps the hero's gold safe
+		if (!Allies.has( Allies.Ally.GHOST )){
+			bag.gold = Dungeon.gold;
+			Dungeon.gold = 0;
+		}
 
 		Belongings b = hero.belongings;
 		Item[] equipped = { b.weapon, b.armor, b.artifact, b.misc, b.ring, b.secondWep };
@@ -192,10 +195,11 @@ public class OpenWorld {
 
 		//revive: fresh buffs (injuries, bleeding, hunger cleared) and half health
 		hero.live();
-		hero.HP = Math.max( 1, hero.HT / 2 );
+		hero.HP = Allies.has( Allies.Ally.GHOST ) ? hero.HT : Math.max( 1, hero.HT / 2 );
 		Actor.fixTime();
 
 		GLog.n( Messages.get(OpenWorld.class, "died") );
+		if (Allies.has( Allies.Ally.GHOST )) GLog.p( Messages.get(Allies.class, "ghost_saved") );
 
 		Game.runOnRenderThread(new Callback() {
 			@Override

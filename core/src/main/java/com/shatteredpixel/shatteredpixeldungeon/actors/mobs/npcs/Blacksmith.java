@@ -442,6 +442,8 @@ public class Blacksmith extends NPC {
 
 		public static void complete(){
 			completed = true;
+			//EFPD: the blacksmith joins the open world base
+			com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.join( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.Ally.BLACKSMITH );
 
 			favor = 0;
 			DarkGold gold = Dungeon.hero.belongings.getItem(DarkGold.class);

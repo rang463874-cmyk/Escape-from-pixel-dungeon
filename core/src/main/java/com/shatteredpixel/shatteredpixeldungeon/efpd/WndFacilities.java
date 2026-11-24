@@ -311,11 +311,11 @@ public class WndFacilities {
 	//--- forge -----------------------------------------------------------------------------------
 
 	private static void addForge( Builder b, int lvl ){
-		b.add( msg( "uncurse", Facilities.UNCURSE_COST ), Facilities.haveGold() >= Facilities.UNCURSE_COST, new Runnable() { public void run() {
+		b.add( msg( "uncurse", Allies.facilityGold( Facilities.UNCURSE_COST ) ), Facilities.haveGold() >= Allies.facilityGold( Facilities.UNCURSE_COST ), new Runnable() { public void run() {
 			forgeSelect( "uncurse_prompt", 0 );
 		}});
 		if (lvl >= 2){
-			b.add( msg( "identify", Facilities.IDENTIFY_COST ), Facilities.haveGold() >= Facilities.IDENTIFY_COST, new Runnable() { public void run() {
+			b.add( msg( "identify", Allies.facilityGold( Facilities.IDENTIFY_COST ) ), Facilities.haveGold() >= Allies.facilityGold( Facilities.IDENTIFY_COST ), new Runnable() { public void run() {
 				forgeSelect( "identify_prompt", 1 );
 			}});
 		}
@@ -327,7 +327,7 @@ public class WndFacilities {
 	}
 
 	private static int reinforceGold( Item item ){
-		return Facilities.REINFORCE_GOLD * (item.level() + 1);
+		return Allies.facilityGold( Facilities.REINFORCE_GOLD * (item.level() + 1) );
 	}
 
 	private static void forgeSelect( final String prompt, final int mode ){
@@ -344,12 +344,12 @@ public class WndFacilities {
 				if (item == null) return;
 				final Hero hero = Dungeon.hero;
 				if (mode == 0){
-					if (Facilities.spendGold( Facilities.UNCURSE_COST )){
+					if (Facilities.spendGold( Allies.facilityGold( Facilities.UNCURSE_COST ) )){
 						ScrollOfRemoveCurse.uncurse( hero, item );
 						GLog.p( msg( "uncursed", Messages.titleCase(item.name()) ) );
 					}
 				} else if (mode == 1){
-					if (Facilities.spendGold( Facilities.IDENTIFY_COST )){
+					if (Facilities.spendGold( Allies.facilityGold( Facilities.IDENTIFY_COST ) )){
 						item.identify();
 						GLog.p( msg( "identified", Messages.titleCase(item.name()) ) );
 					}

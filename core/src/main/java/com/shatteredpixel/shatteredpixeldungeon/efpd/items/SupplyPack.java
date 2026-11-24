@@ -61,7 +61,7 @@ public class SupplyPack extends Bag {
 	}
 
 	public int[] nextCost(){
-		return level >= MAX_LEVEL ? null : UPGRADE_COST[level - 1];
+		return level >= MAX_LEVEL ? null : com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.withAllyDiscount( UPGRADE_COST[level - 1] );
 	}
 
 	public float weightBonus(){

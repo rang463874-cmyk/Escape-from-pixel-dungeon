@@ -112,7 +112,15 @@ public class Facilities {
 
 	public static int[] nextCost( Facility f ){
 		int lvl = level(f);
-		return lvl >= MAX_LEVEL ? null : COSTS[f.ordinal()][lvl];
+		return lvl >= MAX_LEVEL ? null : withAllyDiscount( COSTS[f.ordinal()][lvl] );
+	}
+
+	//the blacksmith ally halves the gold part of building costs
+	public static int[] withAllyDiscount( int[] cost ){
+		if (cost == null) return null;
+		int[] c = cost.clone();
+		c[0] = Allies.facilityGold( c[0] );
+		return c;
 	}
 
 	//materials and gold count both what the hero carries and what is in the stash

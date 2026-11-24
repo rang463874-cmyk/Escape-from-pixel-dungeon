@@ -449,6 +449,8 @@ public class Wandmaker extends NPC {
 		}
 		
 		public static void complete() {
+			//EFPD: the wandmaker joins the open world base
+			com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.join( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.Ally.WANDMAKER );
 			wand1 = null;
 			wand2 = null;
 			

@@ -122,6 +122,7 @@ public class Statistics {
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.reset();
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.reset();
 		totalBossScore  = 0;
 		questScores     = new int[5];
 		totalQuestScore = 0;
@@ -237,6 +238,7 @@ public class Statistics {
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.storeInBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.storeInBundle( bundle );
 		bundle.put( TOT_BOSS,    totalBossScore );
 		bundle.put( QUEST_SCORES,questScores );
 		bundle.put( TOT_QUEST,   totalQuestScore );
@@ -304,6 +306,7 @@ public class Statistics {
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.restoreFromBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.restoreFromBundle( bundle );
 		totalBossScore  = bundle.getInt( TOT_BOSS );
 		if (bundle.contains( QUEST_SCORES ))questScores = bundle.getIntArray( QUEST_SCORES );
 		else                                questScores = new int[5];

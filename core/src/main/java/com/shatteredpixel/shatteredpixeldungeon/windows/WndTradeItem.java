@@ -86,7 +86,7 @@ public class WndTradeItem extends WndInfoItem {
 				pos = warn.bottom();
 			}
 
-			RedButton btnSell = new RedButton( Messages.get(this, "sell", item.value()) ) {
+			RedButton btnSell = new RedButton( Messages.get(this, "sell", com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.sellPrice( item.value() )) ) {
 				@Override
 				protected void onClick() {
 					sell( item, finalShop);
@@ -101,7 +101,7 @@ public class WndTradeItem extends WndInfoItem {
 
 		} else {
 
-			int priceAll= item.value();
+			int priceAll= com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.sellPrice( item.value() ); //EFPD: imp ally
 			RedButton btnSell1 = new RedButton( Messages.get(this, "sell_1", priceAll / item.quantity()) ) {
 				@Override
 				protected void onClick() {
@@ -251,7 +251,7 @@ public class WndTradeItem extends WndInfoItem {
 		//selling items in the sell interface doesn't spend time
 		hero.spend(-hero.cooldown());
 
-		new Gold( item.value() ).doPickUp( hero );
+		new Gold( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.sellPrice( item.value() ) ).doPickUp( hero ); //EFPD: imp ally
 
 		if (shop != null){
 			shop.buybackItems.add(item);
@@ -278,7 +278,7 @@ public class WndTradeItem extends WndInfoItem {
 			//selling items in the sell interface doesn't spend time
 			hero.spend(-hero.cooldown());
 
-			new Gold( item.value() ).doPickUp( hero );
+			new Gold( com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.sellPrice( item.value() ) ).doPickUp( hero ); //EFPD: imp ally
 
 			if (shop != null){
 				shop.buybackItems.add(item);
