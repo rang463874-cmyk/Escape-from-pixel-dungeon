@@ -322,6 +322,13 @@ public class WndDevTools extends Window {
 				Essence.Caves.class, Essence.City.class, Essence.Halls.class, Tonic.Strength.class, Tonic.Vitality.class,
 				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class, Material.Cloth.class, Material.Wood.class,
 				Material.StoneBlock.class, Material.RefinedMetal.class, RecallCharm.class ) );
+		addCategory( list, Messages.get(this, "cat_uniques"), Arrays.asList(
+				com.shatteredpixel.shatteredpixeldungeon.items.quest.GooBlob.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.TenguFeather.class,
+				com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.RoyalSeal.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.OozeBlade.class, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.TenguTalon.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.PistonHammer.class, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.RoyalGlaive.class ) );
 		addCategory( list, Messages.get(this, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
 		addCategory( list, Messages.get(this, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
 				Stylus.class, ArcaneResin.class ) );

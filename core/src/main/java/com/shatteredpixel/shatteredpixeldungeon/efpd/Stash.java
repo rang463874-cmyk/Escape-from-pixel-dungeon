@@ -94,12 +94,15 @@ public class Stash {
 			}
 			gold = bundle.getInt( GOLD );
 			energy = bundle.getInt( ENERGY );
+			//stashes saved before sorting existed are shown sorted too
+			sort();
 		} catch (IOException e) {
 			//no stash yet, start empty
 		}
 	}
 
 	public static void save(){
+		sort();
 		Bundle bundle = new Bundle();
 		bundle.put( ITEMS, items );
 		bundle.put( GOLD, gold );
@@ -109,6 +112,63 @@ public class Stash {
 		} catch (IOException e) {
 			ShatteredPixelDungeon.reportException(e);
 		}
+	}
+
+	//category order for the stash display, unlisted items go last
+	private static final Class<?>[] SORT_ORDER = {
+			com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Gun.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Ammo.class,
+			Armor.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.trinkets.Trinket.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.spells.Spell.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.stones.Runestone.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.bombs.Bomb.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.items.MedicalItem.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.food.Food.class,
+			com.shatteredpixel.shatteredpixeldungeon.plants.Plant.Seed.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.quest.GooBlob.class,
+			com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence.class,
+			com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material.class,
+	};
+
+	private static int category( Item item ){
+		for (int i = 0; i < SORT_ORDER.length; i++){
+			if (SORT_ORDER[i].isInstance( item )) return i;
+		}
+		return SORT_ORDER.length;
+	}
+
+	/** Sorts the stash by category, then by name. Stable, so equal items keep their order. */
+	public static void sort(){
+		java.util.Collections.sort( items, new java.util.Comparator<Item>() {
+			@Override
+			public int compare( Item a, Item b ) {
+				int c = Integer.compare( category(a), category(b) );
+				if (c != 0) return c;
+				//within weapons and armor, higher tiers first
+				int ta = tierOf(a), tb = tierOf(b);
+				if (ta != tb) return Integer.compare( tb, ta );
+				return a.name().compareTo( b.name() );
+			}
+		});
+	}
+
+	private static int tierOf( Item i ){
+		if (i instanceof com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon)
+			return ((com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon) i).tier;
+		if (i instanceof Armor) return ((Armor) i).tier;
+		return 0;
 	}
 
 	public static boolean isEmpty(){

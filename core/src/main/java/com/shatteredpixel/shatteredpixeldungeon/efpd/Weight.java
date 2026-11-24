@@ -122,6 +122,7 @@ public class Weight {
 		if (item instanceof Essence)        return 0.1f;
 		if (item instanceof Material)       return ((Material) item).unitWeight();
 		if (item instanceof RecallCharm)    return 0.1f;
+		if (item instanceof com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy) return 0.2f;
 		if (item instanceof Tonic)          return 0.4f;
 
 		//misc

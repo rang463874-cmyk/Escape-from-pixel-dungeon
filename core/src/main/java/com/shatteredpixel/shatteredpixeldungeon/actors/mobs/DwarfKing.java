@@ -564,6 +564,8 @@ public class DwarfKing extends Mob {
 		} else {
 			Dungeon.level.drop(new KingsCrown(), pos).sprite.drop();
 		}
+		//EFPD: royal seals, for a unique weapon
+		com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.dropAround( pos, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.RoyalSeal.class );
 
 		Badges.validateBossSlain();
 		if (Statistics.qualifiedForBossChallengeBadge){

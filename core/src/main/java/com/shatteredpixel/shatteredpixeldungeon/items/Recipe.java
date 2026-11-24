@@ -200,6 +200,11 @@ public abstract class Recipe {
 	private static Recipe[] twoIngredientRecipes = new Recipe[]{
 		new Blandfruit.CookFruit(),
 		new Bomb.EnhanceBomb(),
+		//EFPD: unique weapons from boss trophies
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewOozeBlade(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewTenguTalon(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewPistonHammer(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewRoyalGlaive(),
 		new UnstableBrew.Recipe(),
 		new CausticBrew.Recipe(),
 		new ElixirOfArcaneArmor.Recipe(),

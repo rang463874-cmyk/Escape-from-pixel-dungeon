@@ -214,6 +214,8 @@ public class Tengu extends Mob {
 		if (Dungeon.hero.subClass == HeroSubClass.NONE) {
 			Dungeon.level.drop( new TengusMask(), pos ).sprite.drop();
 		}
+		//EFPD: Tengu's feathers, for a unique weapon
+		com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.dropAround( pos, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.TenguFeather.class );
 		
 		GameScene.bossSlain();
 		super.die( cause );
