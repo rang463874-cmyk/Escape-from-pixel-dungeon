@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Thirst;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Encumbrance;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -471,6 +472,8 @@ public class Hero extends Char {
 		Buff.affect( this, Hunger.class );
 		//EFPD: weight based inventory
 		Buff.affect( this, Encumbrance.class );
+		//EFPD: open world thirst
+		if (OpenWorld.isActive()) Buff.affect( this, Thirst.class );
 	}
 	
 	public int tier() {
@@ -625,6 +628,8 @@ public class Hero extends Char {
 		evasion *= Injuries.evasionMultiplier(this);
 		//EFPD: open world agility
 		evasion *= PermStats.evasionMultiplier();
+		//EFPD: dehydration makes the hero easier to hit
+		evasion *= Thirst.evasionMultiplier(this);
 
 		if (belongings.armor() != null) {
 			evasion = belongings.armor().evasionFactor(this, evasion);

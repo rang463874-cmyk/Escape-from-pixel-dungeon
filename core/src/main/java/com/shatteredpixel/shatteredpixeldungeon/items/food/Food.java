@@ -72,6 +72,9 @@ public class Food extends Item {
 		super.execute( hero, action );
 
 		if (action.equals( AC_EAT )) {
+
+			//EFPD: an upset stomach can't keep food down
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.Nausea.blocks( hero )) return;
 			
 			detach( hero.belongings.backpack );
 			Catalog.countUse(getClass());

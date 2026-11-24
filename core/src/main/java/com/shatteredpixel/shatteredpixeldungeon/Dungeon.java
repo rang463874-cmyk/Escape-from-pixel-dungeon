@@ -293,6 +293,8 @@ public class Dungeon {
 		Badges.reset();
 		
 		GamesInProgress.selectedClass.initHero( hero );
+		//EFPD: open world heroes start with a full canteen
+		if (OpenWorld.isActive()) new com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen().fill().collect( hero.belongings.backpack );
 		//EFPD: the starting kit can't be extracted into the stash
 		Stash.markStartingKit( hero );
 	}
@@ -837,6 +839,8 @@ public class Dungeon {
 
 		Statistics.restoreFromBundle( bundle );
 		Generator.restoreFromBundle( bundle );
+		//EFPD: open world thirst (the hero is restored before the game mode is known)
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Thirst.sync( hero );
 
 	}
 	

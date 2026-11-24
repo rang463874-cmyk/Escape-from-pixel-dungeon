@@ -138,6 +138,9 @@ public class BuffIndicator extends Component {
 	public static final int THROWN_WEP  = 85;
 	public static final int WEIGHT      = 86; //EFPD: encumbrance
 	public static final int INJURY      = 87; //EFPD: body part injuries
+	public static final int THIRST      = 88; //EFPD: open world thirst
+	public static final int DEHYDRATED  = 89; //EFPD
+	public static final int NAUSEA      = 90; //EFPD: raw water sickness
 
 	public static final int SIZE_SMALL  = 7;
 	public static final int SIZE_LARGE  = 16;

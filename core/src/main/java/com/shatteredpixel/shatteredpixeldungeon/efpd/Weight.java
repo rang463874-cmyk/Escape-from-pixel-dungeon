@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.efpd;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Ammo;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Gun;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
@@ -120,6 +121,7 @@ public class Weight {
 
 		//misc
 		if (item instanceof Waterskin)      return 0.8f;
+		if (item instanceof Canteen)        return ((Canteen) item).weight();
 		if (item instanceof Honeypot)       return 1f;
 
 		return 0.5f;

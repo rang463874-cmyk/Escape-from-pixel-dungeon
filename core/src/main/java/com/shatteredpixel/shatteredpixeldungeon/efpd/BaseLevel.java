@@ -40,7 +40,7 @@ public class BaseLevel extends Level {
 	private static final int W = 17;
 	private static final int H = 13;
 
-	//layout: # wall, . floor, , decorated floor, " grass, E dungeon entrance, A alchemy pot, K keeper, ~ water, T statue
+	//layout: # wall, . floor, , decorated floor, " grass, E dungeon entrance, A alchemy pot, K keeper, ~ water, T statue, W well
 	private static final String[] MAP = {
 			"#################",
 			"#\"\"\".........\"\"\"#",
@@ -50,7 +50,7 @@ public class BaseLevel extends Level {
 			"#..A..,,,,,..~~.#",
 			"#............~~.#",
 			"#.......,.......#",
-			"#......,E,......#",
+			"#..W...,E,......#",
 			"#.......,.......#",
 			"#\"T...........T\"#",
 			"#\"\"\".........\"\"\"#",
@@ -93,6 +93,7 @@ public class BaseLevel extends Level {
 					case '"': map[cell] = Terrain.GRASS; break;
 					case '~': map[cell] = Terrain.WATER; break;
 					case 'T': map[cell] = Terrain.STATUE; break;
+					case 'W': map[cell] = Terrain.EMPTY_WELL; break;
 					case 'A': map[cell] = Terrain.ALCHEMY; break;
 					case 'E': map[cell] = Terrain.EXIT; exit = cell; break;
 					case 'K': map[cell] = Terrain.EMPTY_SP; keeperPos = cell; break;

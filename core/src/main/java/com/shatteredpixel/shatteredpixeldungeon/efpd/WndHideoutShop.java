@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.RifleAmmo;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -48,12 +49,14 @@ public class WndHideoutShop extends WndOptions {
 
 	//stock and prices, edit here to change what the hideout sells
 	private static final Class<?>[] STOCK    = { Bandage.class, Splint.class, FirstAidKit.class, Food.class, PotionOfHealing.class,
-	                                             LightAmmo.class, RifleAmmo.class, ShotgunShell.class };
-	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50 };
-	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6  };
+	                                             LightAmmo.class, RifleAmmo.class, ShotgunShell.class,
+	                                             Canteen.class };
+	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50,   60 };
+	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6,    1  };
 
 	private static Item make( int i ){
 		Item item = (Item) Reflection.newInstance( STOCK[i] );
+		if (item instanceof Canteen) ((Canteen) item).fill();
 		item.identify();
 		if (QUANTITY[i] > 1) item.quantity( QUANTITY[i] );
 		return item;

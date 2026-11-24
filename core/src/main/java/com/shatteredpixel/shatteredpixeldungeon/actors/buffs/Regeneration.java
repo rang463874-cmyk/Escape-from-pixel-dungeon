@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Thirst;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
@@ -55,7 +56,9 @@ public class Regeneration extends Buff {
 				Buff.affect(Dungeon.hero, ChaoticCenser.CenserGasTracker.class);
 			}
 
-			if (regenOn() && target.HP < regencap() && !((Hero)target).isStarving()) {
+			if (regenOn() && target.HP < regencap() && !((Hero)target).isStarving()
+					//EFPD: dehydration stops natural regeneration like starvation
+					&& !Thirst.dehydrated(target)) {
 				boolean chaliceCursed = false;
 				int chaliceLevel = -1;
 				if (target.buff(MagicImmune.class) == null) {

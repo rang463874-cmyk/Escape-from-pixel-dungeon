@@ -878,6 +878,12 @@ public class ItemSpriteSheet {
 		for (int i = TONIC_STRENGTH; i <= TONIC_RESILIENCE; i++) assignItemRect(i, 10, 12);
 	}
 
+	//EFPD: open world canteen
+	public static final int CANTEEN = xy(13, 35);
+	static{
+		assignItemRect(CANTEEN, 11, 12);
+	}
+
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;

@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.LightAmmo;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.RifleAmmo;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
@@ -234,6 +235,16 @@ public class WndDevTools extends Window {
 			}
 		});
 
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.CANTEEN), Messages.get(this, "thirst") ){
+			@Override protected void give() {
+				Thirst t = Dungeon.hero.buff( Thirst.class );
+				if (t == null){
+					GLog.w( Messages.get(Tonic.class, "only_open_world") );
+					return;
+				}
+				t.quench( -Thirst.DEHYDRATED );
+			}
+		});
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.TONIC_STRENGTH), Messages.get(this, "stat_xp") ){
 			@Override protected void give() {
 				if (!OpenWorld.isActive()){
@@ -283,7 +294,7 @@ public class WndDevTools extends Window {
 				SmokeBomb.class, WoollyBomb.class, ArcaneBomb.class ) );
 		addCategory( list, Messages.get(this, "cat_openworld"), Arrays.asList( Essence.Sewers.class, Essence.Prison.class,
 				Essence.Caves.class, Essence.City.class, Essence.Halls.class, Tonic.Strength.class, Tonic.Vitality.class,
-				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class ) );
+				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class ) );
 		addCategory( list, Messages.get(this, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
 		addCategory( list, Messages.get(this, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
 				Stylus.class, ArcaneResin.class ) );
@@ -321,6 +332,7 @@ public class WndDevTools extends Window {
 
 	private static Item prepare( Item item ){
 		if (item instanceof Gun) ((Gun) item).fill();
+		if (item instanceof Canteen) ((Canteen) item).fill();
 		//the upgrade level picks the tonic grade
 		if (item instanceof Tonic) ((Tonic) item).grade( Math.max(1, level) );
 		//artifacts level up through use, not upgrades
