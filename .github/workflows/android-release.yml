@@ -43,6 +43,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: gradle
 
       - name: Install Android SDK packages
         run: |
@@ -71,7 +72,17 @@ jobs:
       - name: Build APKs
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon -PskipIos android:assembleRelease android:assembleDebug 2>&1 | tee build.log
+          # dependency downloads sometimes hit Maven Central rate limits (HTTP 429): retry a few times
+          for attempt in 1 2 3; do
+            if ./gradlew --no-daemon -PskipIos android:assembleRelease android:assembleDebug > build.log 2>&1; then
+              tail -n 20 build.log
+              exit 0
+            fi
+            tail -n 40 build.log
+            echo "Build attempt $attempt failed, retrying in $((attempt * 60))s"
+            sleep $((attempt * 60))
+          done
+          exit 1
 
       - name: Collect APKs
         run: |
