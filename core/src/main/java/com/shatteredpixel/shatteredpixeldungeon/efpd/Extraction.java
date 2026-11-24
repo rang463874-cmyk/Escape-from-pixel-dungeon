@@ -25,18 +25,21 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
+import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.TitleScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Game;
 import com.watabou.utils.Callback;
 
 /**
- * Handles leaving the dungeon through the floor 1 entrance without the Amulet:
- * the hero escapes alive and everything they carry goes to the stash.
+ * Handles extraction points: the floor 1 entrance, and the up stairs of every boss floor
+ * once its boss is slain. Extracting ends the run and moves the hero's loot to the stash.
  */
 public class Extraction {
 
@@ -60,6 +63,46 @@ public class Extraction {
 							confirmExtraction( hero );
 						} else if (index == 1){
 							GameScene.show( new WndStash() );
+						}
+					}
+				});
+			}
+		});
+	}
+
+	//called whenever a boss dies (GameScene.bossSlain)
+	public static void onBossSlain(){
+		if (Dungeon.branch == 0 && Dungeon.bossLevel()){
+			Statistics.efpdBossesCleared |= 1 << Dungeon.depth;
+			GLog.p( Messages.get(Extraction.class, "boss_exit_open") );
+		}
+	}
+
+	public static boolean bossExitAvailable( Hero hero, LevelTransition transition ){
+		return transition.type == LevelTransition.Type.REGULAR_ENTRANCE
+				&& Dungeon.branch == 0
+				&& Dungeon.bossLevel()
+				&& (Statistics.efpdBossesCleared & (1 << Dungeon.depth)) != 0
+				//heroes carrying the amulet keep the original ascent
+				&& hero.belongings.getItem( Amulet.class ) == null;
+	}
+
+	public static void showBossExitWindow( final Hero hero, final LevelTransition transition ){
+		Game.runOnRenderThread(new Callback() {
+			@Override
+			public void call() {
+				GameScene.show( new WndOptions( Icons.get(Icons.STAIRS),
+						Messages.get(Extraction.class, "boss_exit_title"),
+						Messages.get(Extraction.class, "boss_exit_desc"),
+						Messages.get(Extraction.class, "extract"),
+						Messages.get(Extraction.class, "ascend"),
+						Messages.get(Extraction.class, "cancel") ){
+					@Override
+					protected void onSelect(int index) {
+						if (index == 0){
+							confirmExtraction( hero );
+						} else if (index == 1){
+							Dungeon.level.performTransition( hero, transition );
 						}
 					}
 				});

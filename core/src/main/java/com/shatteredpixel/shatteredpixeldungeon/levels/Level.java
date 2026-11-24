@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Extraction;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
@@ -592,6 +593,21 @@ public abstract class Level implements Bundlable {
 
 	//returns true if we immediately transition, false otherwise
 	public boolean activateTransition(Hero hero, LevelTransition transition){
+		if (locked){
+			return false;
+		}
+
+		//EFPD: after the boss is slain, a boss floor's up stairs double as an extraction point
+		if (Extraction.bossExitAvailable(hero, transition)){
+			Extraction.showBossExitWindow( hero, transition );
+			return false;
+		}
+
+		return performTransition( hero, transition );
+	}
+
+	//EFPD: the regular level transition, split out so the extraction window can trigger it
+	public boolean performTransition(Hero hero, LevelTransition transition){
 		if (locked){
 			return false;
 		}

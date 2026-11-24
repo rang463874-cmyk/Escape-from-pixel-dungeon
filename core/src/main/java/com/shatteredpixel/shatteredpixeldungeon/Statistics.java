@@ -49,6 +49,8 @@ public class Statistics {
 	public static SparseArray<Float> floorsExplored = new SparseArray<>();
 	public static int exploreScore;
 	public static int[] bossScores = new int[5];
+	//EFPD: bitmask of boss floors (bit = depth) whose boss has been slain this run
+	public static int efpdBossesCleared;
 	public static int totalBossScore;
 	public static int[] questScores = new int[5];
 	public static int totalQuestScore;
@@ -96,6 +98,7 @@ public class Statistics {
 		floorsExplored  = new SparseArray<>();
 		exploreScore    = 0;
 		bossScores      = new int[5];
+		efpdBossesCleared = 0;
 		totalBossScore  = 0;
 		questScores     = new int[5];
 		totalQuestScore = 0;
@@ -140,6 +143,7 @@ public class Statistics {
 	private static final String FLR_EXPL        = "flr_expl_";
 	private static final String EXPL_SCORE      = "expl_score";
 	private static final String BOSS_SCORES		= "boss_scores";
+	private static final String EFPD_BOSSES		= "efpd_bosses_cleared";
 	private static final String TOT_BOSS		= "tot_boss";
 	private static final String QUEST_SCORES	= "quest_scores";
 	private static final String TOT_QUEST		= "tot_quest";
@@ -188,6 +192,7 @@ public class Statistics {
 		}
 		bundle.put( EXPL_SCORE,  exploreScore );
 		bundle.put( BOSS_SCORES, bossScores );
+		bundle.put( EFPD_BOSSES, efpdBossesCleared );
 		bundle.put( TOT_BOSS,    totalBossScore );
 		bundle.put( QUEST_SCORES,questScores );
 		bundle.put( TOT_QUEST,   totalQuestScore );
@@ -242,6 +247,7 @@ public class Statistics {
 		exploreScore    = bundle.getInt( EXPL_SCORE );
 		if (bundle.contains( BOSS_SCORES )) bossScores = bundle.getIntArray( BOSS_SCORES );
 		else                                bossScores = new int[5];
+		efpdBossesCleared = bundle.getInt( EFPD_BOSSES );
 		totalBossScore  = bundle.getInt( TOT_BOSS );
 		if (bundle.contains( QUEST_SCORES ))questScores = bundle.getIntArray( QUEST_SCORES );
 		else                                questScores = new int[5];

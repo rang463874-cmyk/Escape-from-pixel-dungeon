@@ -95,6 +95,10 @@ public class Item implements Bundlable {
 	// this is largely set by the resurrection window, items can override this to always be kept
 	public boolean keptThoughLostInvent = false;
 
+	//EFPD: how many units of this item (stack) came from the hero's starting kit.
+	// Starting kit units are never moved into the stash on extraction.
+	public int starterQuantity = 0;
+
 	// whether an item can be included in heroes remains
 	public boolean bones = false;
 
@@ -199,6 +203,9 @@ public class Item implements Bundlable {
 		if (isSimilar( other )){
 			quantity += other.quantity;
 			other.quantity = 0;
+			//EFPD
+			starterQuantity += other.starterQuantity;
+			other.starterQuantity = 0;
 		}
 		return this;
 	}
@@ -300,6 +307,10 @@ public class Item implements Bundlable {
 			split.restoreFromBundle(copy);
 			split.quantity(amount);
 			quantity -= amount;
+
+			//EFPD: starting kit units are split off first
+			split.starterQuantity = Math.min(starterQuantity, amount);
+			starterQuantity -= split.starterQuantity;
 			
 			return split;
 		}
@@ -585,6 +596,7 @@ public class Item implements Bundlable {
 	private static final String QUICKSLOT		= "quickslotpos";
 	private static final String KEPT_LOST       = "kept_lost";
 	private static final String CUSTOM_NOTE_ID = "custom_note_id";
+	private static final String EFPD_STARTER   = "efpd_starter";
 	
 	@Override
 	public void storeInBundle( Bundle bundle ) {
@@ -598,6 +610,7 @@ public class Item implements Bundlable {
 		}
 		bundle.put( KEPT_LOST, keptThoughLostInvent );
 		if (customNoteID != -1)     bundle.put(CUSTOM_NOTE_ID, customNoteID);
+		if (starterQuantity > 0)    bundle.put(EFPD_STARTER, starterQuantity);
 	}
 	
 	@Override
@@ -623,6 +636,7 @@ public class Item implements Bundlable {
 		}
 
 		keptThoughLostInvent = bundle.getBoolean( KEPT_LOST );
+		starterQuantity = bundle.getInt( EFPD_STARTER );
 		if (bundle.contains(CUSTOM_NOTE_ID))    customNoteID = bundle.getInt(CUSTOM_NOTE_ID);
 	}
 

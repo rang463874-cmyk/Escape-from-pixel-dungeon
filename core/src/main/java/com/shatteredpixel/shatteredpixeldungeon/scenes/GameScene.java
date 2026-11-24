@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Extraction;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Stash;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
@@ -1630,6 +1631,9 @@ public class GameScene extends PixelScene {
 	}
 	
 	public static void bossSlain() {
+		//EFPD: slaying a floor boss turns its up stairs into an extraction point
+		Extraction.onBossSlain();
+
 		if (Dungeon.hero.isAlive()) {
 			Banner bossSlain = new Banner( BannerSprites.get( BannerSprites.Type.BOSS_SLAIN ) );
 			bossSlain.show( 0xFFFFFF, 0.3f, 5f );

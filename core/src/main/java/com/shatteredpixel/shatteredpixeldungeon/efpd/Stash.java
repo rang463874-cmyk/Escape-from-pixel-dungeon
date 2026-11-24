@@ -27,7 +27,10 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
+import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.CeremonialCandle;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.CorpseDust;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.DwarfToken;
@@ -47,7 +50,8 @@ import java.util.ArrayList;
  *
  * Rules of the extraction loop:
  *  - Items are only added to the stash when the hero successfully extracts
- *    (climbs out of the dungeon entrance on floor 1).
+ *    (floor 1 entrance, or the up stairs of a boss floor after the boss is slain).
+ *  - The starting kit and bags are never stored (bag contents are).
  *  - If the hero dies, everything they carried into the dungeon is lost.
  *  - Items can only be withdrawn at the start of a run, before descending.
  *
@@ -119,8 +123,24 @@ public class Stash {
 	}
 
 	/**
-	 * Moves everything the hero carries (equipped items, backpack, bag contents)
-	 * plus their gold into the stash. Returns the number of item stacks stored.
+	 * Marks everything the hero starts with, so it is never moved into the stash.
+	 * Called right after the starting kit is handed out.
+	 */
+	public static void markStartingKit( Hero hero ){
+		for (Item i : hero.belongings){
+			i.starterQuantity = i.quantity();
+		}
+		//the warrior's broken seal is stored inside his armor, not in the inventory
+		if (hero.belongings.armor != null && hero.belongings.armor.checkSeal() != null){
+			BrokenSeal seal = hero.belongings.armor.checkSeal();
+			seal.starterQuantity = seal.quantity();
+		}
+	}
+
+	/**
+	 * Moves what the hero carries (equipped items, backpack, bag contents) plus their gold
+	 * into the stash. Starting kit items and the bags themselves are left behind.
+	 * Returns the number of item stacks stored.
 	 */
 	public static int depositAll( Hero hero ){
 		load();
@@ -132,15 +152,21 @@ public class Stash {
 		for (Item i : equipped){
 			if (i != null) carried.add(i);
 		}
-		//top level backpack items only, bags keep their own contents when bundled
-		carried.addAll( b.backpack.items );
+		for (Item i : b.backpack.items){
+			if (i instanceof Bag){
+				//bags are not stored, but their contents are
+				carried.addAll( ((Bag) i).items );
+			} else {
+				carried.add(i);
+			}
+		}
 
 		int stored = 0;
 		for (Item i : carried){
-			if (!stashable(i)) continue;
-			i.identify(false);
-			items.add(i);
-			stored++;
+			if (prepareForStash(i)){
+				items.add(i);
+				stored++;
+			}
 		}
 
 		gold += Dungeon.gold;
@@ -148,6 +174,27 @@ public class Stash {
 
 		save();
 		return stored;
+	}
+
+	//strips starting kit parts from an item, returns false if nothing is left to store
+	private static boolean prepareForStash( Item i ){
+		if (i instanceof Bag || !stashable(i)) return false;
+
+		int keep = i.quantity() - Math.min(i.starterQuantity, i.quantity());
+		if (keep <= 0) return false;
+		if (keep < i.quantity()) i.quantity(keep);
+		i.starterQuantity = 0;
+
+		//a starting broken seal stays behind even when affixed to found armor
+		if (i instanceof Armor){
+			BrokenSeal seal = ((Armor) i).checkSeal();
+			if (seal != null && seal.starterQuantity > 0){
+				((Armor) i).detachSeal();
+			}
+		}
+
+		i.identify(false);
+		return true;
 	}
 
 	/** Removes an item from the stash and gives it to the hero. */
