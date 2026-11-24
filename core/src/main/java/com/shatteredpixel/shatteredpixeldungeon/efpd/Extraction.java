@@ -24,8 +24,13 @@ package com.shatteredpixel.shatteredpixeldungeon.efpd;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
+import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -36,6 +41,8 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Game;
 import com.watabou.utils.Callback;
+
+import java.io.IOException;
 
 /**
  * Handles extraction points: the floor 1 entrance, and the up stairs of every boss floor
@@ -125,22 +132,59 @@ public class Extraction {
 		});
 	}
 
+	/**
+	 * Extracting moves the hero into the hideout: the run stays alive (so the original
+	 * shop and alchemy systems work on the hero's inventory) until they finish up.
+	 */
 	public static void extract( final Hero hero ){
-		//leave GameScene first, so the run can't be auto-saved again after it is deleted
+		Statistics.efpdInHideout = true;
 		Statistics.ascended = true;
+
+		//the hideout is safe: clear out enemies on the floor
+		for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])){
+			if (m.alignment == Char.Alignment.ENEMY){
+				//removed silently: destroy() would count as a kill and grant exp
+				Actor.remove( m );
+				Dungeon.level.mobs.remove( m );
+				if (m.sprite != null) m.sprite.killAndErase();
+			}
+		}
+
+		//stash gold and energy are usable in the hideout, they go back when finishing
+		Stash.load();
+		Dungeon.gold += Stash.gold;
+		Dungeon.energy += Stash.energy;
+		Stash.gold = 0;
+		Stash.energy = 0;
+		Stash.save();
+		//refresh the gold shown in the inventory
+		Item.updateQuickslot();
+
+		try {
+			Dungeon.saveAll();
+		} catch (IOException e) {
+			ShatteredPixelDungeon.reportException(e);
+		}
+		GLog.p( Messages.get(Extraction.class, "hideout_arrive") );
+		//GameScene shows the hideout menu as soon as no other window is open
+	}
+
+	/** Ends the run: everything the hero carries goes into the stash. */
+	public static void finish( final Hero hero ){
+		//leave GameScene first, so the run can't be auto-saved again after it is deleted
 		Game.switchScene(TitleScene.class, new Game.SceneChangeCallback() {
 			@Override
 			public void beforeCreate() {}
 
 			@Override
 			public void afterCreate() {
+				Statistics.efpdInHideout = false;
 				int depth = Statistics.deepestFloor;
-				int goldBefore = Dungeon.gold;
 				int stored = Stash.depositAll( hero );
 				Dungeon.deleteGame( GamesInProgress.curSlot, true );
 
 				Game.scene().addToFront( new WndMessage(
-						Messages.get(Extraction.class, "success", depth, stored, goldBefore) ) );
+						Messages.get(Extraction.class, "success", depth, stored, Stash.gold, Stash.energy) ) );
 			}
 		});
 	}

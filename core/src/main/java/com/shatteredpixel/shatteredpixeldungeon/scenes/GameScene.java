@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.WndHideout;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -891,6 +892,11 @@ public class GameScene extends PixelScene {
 		}
 
 		super.update();
+
+		//EFPD: while in the hideout, its menu returns whenever nothing else is open
+		if (Statistics.efpdInHideout && !interfaceBlockingHero()){
+			show( new WndHideout() );
+		}
 
 		if (notifyDelay > 0) notifyDelay -= Game.elapsed;
 

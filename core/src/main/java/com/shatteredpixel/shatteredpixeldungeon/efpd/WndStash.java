@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.efpd;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -85,7 +86,7 @@ public class WndStash extends Window {
 		Stash.load();
 		boolean canWithdraw = Stash.canWithdraw();
 
-		subtitle.text( Messages.get(this, canWithdraw ? "can_withdraw" : "locked") );
+		subtitle.text( Messages.get(this, Statistics.efpdInHideout ? "hideout" : canWithdraw ? "can_withdraw" : "locked") );
 
 		grid.clear();
 		if (Stash.items.isEmpty()){

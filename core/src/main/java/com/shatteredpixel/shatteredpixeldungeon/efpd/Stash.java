@@ -64,9 +64,12 @@ public class Stash {
 
 	private static final String ITEMS = "items";
 	private static final String GOLD  = "gold";
+	private static final String ENERGY = "energy";
 
 	public static ArrayList<Item> items = new ArrayList<>();
 	public static int gold = 0;
+	//alchemical energy, only usable at the hideout alchemy station
+	public static int energy = 0;
 
 	//quest items and other run-bound items which make no sense in a new run
 	private static final Class<?>[] NOT_STASHABLE = new Class<?>[]{
@@ -83,12 +86,14 @@ public class Stash {
 	public static void load(){
 		items = new ArrayList<>();
 		gold = 0;
+		energy = 0;
 		try {
 			Bundle bundle = FileUtils.bundleFromFile( STASH_FILE );
 			for (Bundlable b : bundle.getCollection( ITEMS )){
 				if (b instanceof Item) items.add( (Item)b );
 			}
 			gold = bundle.getInt( GOLD );
+			energy = bundle.getInt( ENERGY );
 		} catch (IOException e) {
 			//no stash yet, start empty
 		}
@@ -98,6 +103,7 @@ public class Stash {
 		Bundle bundle = new Bundle();
 		bundle.put( ITEMS, items );
 		bundle.put( GOLD, gold );
+		bundle.put( ENERGY, energy );
 		try {
 			FileUtils.bundleToFile( STASH_FILE, bundle );
 		} catch (IOException e) {
@@ -119,6 +125,8 @@ public class Stash {
 
 	//withdrawing is only possible while preparing for a raid: on floor 1, before ever descending
 	public static boolean canWithdraw(){
+		//in the hideout withdrawn items go back into the stash when the hero finishes up
+		if (Statistics.efpdInHideout) return true;
 		return Dungeon.depth == 1 && Dungeon.branch == 0 && Statistics.deepestFloor <= 1;
 	}
 
@@ -171,6 +179,8 @@ public class Stash {
 
 		gold += Dungeon.gold;
 		Dungeon.gold = 0;
+		energy += Dungeon.energy;
+		Dungeon.energy = 0;
 
 		save();
 		return stored;

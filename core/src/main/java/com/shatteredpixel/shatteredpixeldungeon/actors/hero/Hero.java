@@ -1651,6 +1651,9 @@ public class Hero extends Char {
 
 	@Override
 	public void damage( int dmg, Object src ) {
+		//EFPD: the hero is safe while managing loot in the hideout
+		if (Statistics.efpdInHideout) return;
+
 		if (buff(TimekeepersHourglass.timeStasis.class) != null
 				|| buff(TimeStasis.class) != null) {
 			return;
