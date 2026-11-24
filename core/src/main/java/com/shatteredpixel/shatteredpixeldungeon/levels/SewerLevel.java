@@ -26,6 +26,8 @@ import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Extraction;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Stash;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Ghost;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Ripple;
@@ -146,12 +148,8 @@ public class SewerLevel extends RegularLevel {
 	public boolean activateTransition(Hero hero, LevelTransition transition) {
 		if (transition.type == LevelTransition.Type.SURFACE){
 			if (hero.belongings.getItem( Amulet.class ) == null) {
-				Game.runOnRenderThread(new Callback() {
-					@Override
-					public void call() {
-						GameScene.show( new WndMessage( Messages.get(hero, "leave") ) );
-					}
-				});
+				//EFPD: the dungeon entrance is the extraction point / hideout door
+				Extraction.showEntranceWindow( hero );
 				return false;
 			} else {
 				Statistics.ascended = true;
@@ -165,6 +163,8 @@ public class SewerLevel extends RegularLevel {
 					public void afterCreate() {
 						Badges.validateHappyEnd();
 						Dungeon.win( Amulet.class );
+						//EFPD: escaping with the amulet is the ultimate extraction
+						Stash.depositAll( hero );
 						Dungeon.deleteGame( GamesInProgress.curSlot, true );
 						Badges.saveGlobal();
 					}

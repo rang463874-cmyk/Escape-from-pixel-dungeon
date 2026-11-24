@@ -3,8 +3,11 @@ include ':SPD-classes'
 include ':core'
 
 //platform modules
-include ':android'
-include ':ios'
+//pass -PdesktopOnly to skip android/ios (no Android SDK / Google maven needed)
+if (!providers.gradleProperty('desktopOnly').isPresent()) {
+    include ':android'
+    include ':ios'
+}
 include ':desktop'
 
 //service modules

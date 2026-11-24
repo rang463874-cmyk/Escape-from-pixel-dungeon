@@ -1,27 +1,32 @@
-# Shattered Pixel Dungeon
+# Escape from Pixel Dungeon
 
-[Shattered Pixel Dungeon](https://shatteredpixel.com/shatteredpd/) is an open-source traditional roguelike dungeon crawler with randomized levels and enemies, and hundreds of items to collect and use. It's based on the [source code of Pixel Dungeon](https://github.com/00-Evan/pixel-dungeon-gradle), by [Watabou](https://watabou.itch.io/).
+[Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon) (v4.0.2)을 기반으로 한 **하드코어 파밍·익스트랙션 생존 모드**입니다.
+원작은 Evan Debenham의 작품이며, 이 모드도 원작과 같이 **GPLv3** 라이선스를 따릅니다 (`LICENSE.txt`). 원본 README는 `README_SPD.md`에 있습니다.
 
-Shattered Pixel Dungeon currently compiles for Android, iOS, and Desktop platforms. You can find official releases of the game on:
+## 핵심 루프 (익스트랙션)
 
-[![Get it on Google Play](https://shatteredpixel.com/assets/images/badges/gplay.png)](https://play.google.com/store/apps/details?id=com.shatteredpixel.shatteredpixeldungeon)
-[![Download on the App Store](https://shatteredpixel.com/assets/images/badges/appstore.png)](https://apps.apple.com/app/shattered-pixel-dungeon/id1563121109)
-[![Steam](https://shatteredpixel.com/assets/images/badges/steam.png)](https://store.steampowered.com/app/1769170/Shattered_Pixel_Dungeon/)<br>
-[![GOG.com](https://shatteredpixel.com/assets/images/badges/gog.png)](https://www.gog.com/game/shattered_pixel_dungeon)
-[![Itch.io](https://shatteredpixel.com/assets/images/badges/itch.png)](https://shattered-pixel.itch.io/shattered-pixel-dungeon)
-[![Github Releases](https://shatteredpixel.com/assets/images/badges/github.png)](https://github.com/00-Evan/shattered-pixel-dungeon/releases)
+- **은신처 창고(Stash)**: 게임과 게임 사이에 유지되는 영구 창고 (`stash.dat`).
+- **탈출**: 1층 입구 계단을 밟으면 탈출 창이 뜹니다. 탈출하면 소지한 모든 아이템(퀘스트 아이템 제외)과 골드가 창고로 옮겨지고 게임이 끝납니다.
+- **사망**: 가지고 들어간 모든 것을 잃습니다.
+- **준비**: 창고에서 아이템을 꺼내는 건 탐험 시작 전(처음 내려가기 전)에만 할 수 있습니다.
+- 앰뮬렛을 들고 탈출해도 창고에 보관됩니다.
 
-If you like this game, please consider [supporting me on Patreon](https://www.patreon.com/ShatteredPixel)!
+모드 코드는 `core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/efpd/`에 있고, 원본 파일을 고친 곳에는 `//EFPD:` 주석을 달았습니다.
 
-There is an official blog for this project at [ShatteredPixel.com](https://www.shatteredpixel.com/blog/).
+## 로드맵
 
-The game also has a translation project hosted on [Transifex](https://explore.transifex.com/shattered-pixel/shattered-pixel-dungeon/).
+- [x] 은신처 창고 + 1층 탈출
+- [ ] 깊은 층의 탈출 지점 (보스 층 이후 등)
+- [ ] 무게 기반 인벤토리 / 과적 페널티
+- [ ] 부상·출혈 상태이상과 치료 아이템
+- [ ] 오픈월드 생존 모드 (영구 스탯 성장)
 
-Note that **this repository does not accept pull requests!** The code here is provided in hopes that others may find it useful for their own projects, not to allow community contribution. Issue reports of all kinds (bug reports, feature requests, etc.) are welcome.
+## 빌드 (데스크톱)
 
-If you'd like to work with the code, you can find the following guides in `/docs`:
-- [Compiling for Android.](docs/getting-started-android.md)
-    - **[If you plan to distribute on Google Play please read the end of this guide.](docs/getting-started-android.md#distributing-your-app)**
-- [Compiling for desktop platforms.](docs/getting-started-desktop.md)
-- [Compiling for iOS.](docs/getting-started-ios.md)
-- [Recommended changes for making your own version.](docs/recommended-changes.md)
+```bash
+# Android SDK 없이 데스크톱만 빌드/실행
+./gradlew desktop:debug -PdesktopOnly     # 실행
+./gradlew desktop:release -PdesktopOnly   # 실행 가능한 jar
+```
+
+`-PdesktopOnly`를 빼면 원래처럼 android/ios 모듈도 포함됩니다 (Android SDK 필요).
