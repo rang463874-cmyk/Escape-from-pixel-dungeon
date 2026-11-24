@@ -115,6 +115,13 @@
 - 상단에서 강화 단계(0–30)와 개수(1–999)를 정하고(숫자를 누르면 직접 입력), 아래 목록에서 아이템 이름을 누르면 지급됩니다.
 - 목록은 게임의 아이템 표에서 자동으로 만들어지므로, 새 아이템을 드랍 풀에 넣으면 따로 등록하지 않아도 나타납니다.
 
+## 모바일(안드로이드) 설치와 릴리즈
+
+- [Releases](../../releases)에서 최신 `EscapeFromPixelDungeon-<버전>.apk`를 받아 설치합니다(안드로이드 5.0 이상, "출처를 알 수 없는 앱" 허용 필요).
+- `-devtools.apk`는 개발자 도구가 켜진 테스트용이며, 별도 앱으로 설치됩니다.
+- 새 버전 만들기: `build.gradle`의 `appVersionCode`·`appVersionName`과 `docs/release-notes.md`의 `internal version number`를 올린 뒤, `v<버전>` 태그를 푸시하면 GitHub Actions(`.github/workflows/android-release.yml`)가 APK를 빌드해 릴리즈로 올립니다. 게임 안의 업데이트 알림도 이 릴리즈를 봅니다.
+- 서명: 저장소 시크릿 `EFPD_KEYSTORE_B64`(키스토어 base64), `EFPD_KEYSTORE_PASSWORD`, `EFPD_KEY_ALIAS`, `EFPD_KEY_PASSWORD`가 있으면 그 키로 서명합니다. 없으면 저장소에 들어 있는 `android/efpd-debug.keystore`(비밀번호가 공개된 디버그용 키)로 서명합니다. 서명 키를 바꾸면 기존 앱 위에 업데이트할 수 없어 삭제 후 재설치(세이브 삭제)가 필요하니, 개인 키는 정식 배포 전에 정하는 것이 좋습니다.
+
 ## 로드맵
 
 - [x] 은신처 창고 + 1층 탈출

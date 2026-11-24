@@ -23,8 +23,29 @@ android {
         targetSdkVersion appAndroidTargetSDK
     }
 
+    //EFPD: release signing. Set EFPD_KEYSTORE (path), EFPD_KEYSTORE_PASSWORD, EFPD_KEY_ALIAS and
+    //EFPD_KEY_PASSWORD to sign with a private key. Without them the release is signed with the
+    //committed efpd-debug.keystore, whose password is public: it only keeps updates installable.
+    signingConfigs {
+        efpd {
+            def ks = System.getenv('EFPD_KEYSTORE')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('EFPD_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('EFPD_KEY_ALIAS')
+                keyPassword System.getenv('EFPD_KEY_PASSWORD')
+            } else {
+                storeFile file('efpd-debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
+    }
+
     buildTypes {
         debug {
+            signingConfig signingConfigs.efpd
             applicationIdSuffix ".indev"
             versionNameSuffix '-INDEV'
             dependencies {
@@ -33,6 +54,7 @@ android {
             }
         }
         release {
+            signingConfig signingConfigs.efpd
 
             //These lines enable R8, which is a code shrinker/optimizer/obfuscator.
             //This makes release APKs smaller and more efficient, but also makes debugging trickier

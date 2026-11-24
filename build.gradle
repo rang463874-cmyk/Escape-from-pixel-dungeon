@@ -17,8 +17,9 @@ allprojects {
         appPackageName = 'com.escapefrompixeldungeon.efpd'
 
         //Full releases gets +2 on version code, needed for an F-Droid quirk
-        appVersionCode = 922
-        appVersionName = '4.0.2'
+        //EFPD: own version line. The code must stay above Shattered's (922) so saves stay compatible.
+        appVersionCode = 1004
+        appVersionName = '0.4.0'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 

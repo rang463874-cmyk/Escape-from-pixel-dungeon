@@ -6,7 +6,10 @@ include ':core'
 //pass -PdesktopOnly to skip android/ios (no Android SDK / Google maven needed)
 if (!providers.gradleProperty('desktopOnly').isPresent()) {
     include ':android'
-    include ':ios'
+    //pass -PskipIos to skip the iOS (RoboVM) module, e.g. on Linux CI
+    if (!providers.gradleProperty('skipIos').isPresent()) {
+        include ':ios'
+    }
 }
 include ':desktop'
 
