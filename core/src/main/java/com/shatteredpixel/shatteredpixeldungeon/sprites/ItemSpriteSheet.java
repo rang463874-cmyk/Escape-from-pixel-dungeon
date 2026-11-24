@@ -874,14 +874,27 @@ public class ItemSpriteSheet {
 	public static final int TONIC_ENDURANCE = EFPD_TONIC+4;
 	public static final int TONIC_RESILIENCE= EFPD_TONIC+5;
 	static{
-		for (int i = ESSENCE_SEWERS; i <= ESSENCE_HALLS; i++) assignItemRect(i, 9, 11);
-		for (int i = TONIC_STRENGTH; i <= TONIC_RESILIENCE; i++) assignItemRect(i, 10, 12);
+		for (int i = ESSENCE_SEWERS; i <= ESSENCE_HALLS; i++) assignItemRect(i, 7, 11);
+		for (int i = TONIC_STRENGTH; i <= TONIC_RESILIENCE; i++) assignItemRect(i, 8, 12);
 	}
 
 	//EFPD: open world canteen
 	public static final int CANTEEN = xy(13, 35);
 	static{
 		assignItemRect(CANTEEN, 11, 12);
+	}
+
+	//EFPD: open world building materials
+	private static final int EFPD_MATERIALS = xy(1, 36); //4 slots
+	public static final int MAT_CLOTH = EFPD_MATERIALS+0;
+	public static final int MAT_WOOD  = EFPD_MATERIALS+1;
+	public static final int MAT_STONE = EFPD_MATERIALS+2;
+	public static final int MAT_METAL = EFPD_MATERIALS+3;
+	static{
+		assignItemRect(MAT_CLOTH, 10, 9);
+		assignItemRect(MAT_WOOD,  12, 8);
+		assignItemRect(MAT_STONE, 11, 8);
+		assignItemRect(MAT_METAL, 12, 6);
 	}
 
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots

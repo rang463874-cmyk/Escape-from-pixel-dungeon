@@ -389,6 +389,10 @@ public abstract class RegularLevel extends Level {
 		for (Item med : MedicalSupplies.levelLoot()){
 			drop( med, randomDropCell() );
 		}
+		//EFPD: open world building materials
+		for (Item mat : com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material.levelLoot()){
+			drop( mat, randomDropCell() );
+		}
 		//EFPD: ammo for guns
 		for (Item ammo : AmmoSupplies.levelLoot()){
 			drop( ammo, randomDropCell() );

@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.RifleAmmo;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
@@ -302,7 +303,8 @@ public class WndDevTools extends Window {
 				SmokeBomb.class, WoollyBomb.class, ArcaneBomb.class ) );
 		addCategory( list, Messages.get(this, "cat_openworld"), Arrays.asList( Essence.Sewers.class, Essence.Prison.class,
 				Essence.Caves.class, Essence.City.class, Essence.Halls.class, Tonic.Strength.class, Tonic.Vitality.class,
-				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class ) );
+				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class, Material.Cloth.class, Material.Wood.class,
+				Material.StoneBlock.class, Material.RefinedMetal.class ) );
 		addCategory( list, Messages.get(this, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
 		addCategory( list, Messages.get(this, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
 				Stylus.class, ArcaneResin.class ) );
@@ -325,6 +327,7 @@ public class WndDevTools extends Window {
 		Item item = (Item) Reflection.newInstance( cls );
 		if (item == null) return;
 
+		String name = Messages.titleCase( item.name() );
 		if (item.stackable){
 			item.quantity( quantity );
 			grant( prepare( item ) );
@@ -334,8 +337,8 @@ public class WndDevTools extends Window {
 				grant( prepare( copy ) );
 			}
 		}
-		GLog.i( Messages.get(WndDevTools.class, "gave", Messages.titleCase(item.name()),
-				item.stackable ? item.quantity() : quantity) );
+		//the item may have merged into an existing stack, so report the requested amount
+		GLog.i( Messages.get(WndDevTools.class, "gave", name, quantity) );
 	}
 
 	private static Item prepare( Item item ){

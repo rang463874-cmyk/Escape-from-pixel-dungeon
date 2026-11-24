@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Nausea;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Thirst;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 /**
  * Canteen: holds up to MAX_SIPS sips of water.
  *  - Filled at the base well or spring (clean), or from any water in the dungeon (raw).
- *  - Raw water can upset the stomach (Nausea). Boiling it in town makes it clean.
+ *  - Raw water can upset the stomach (Nausea). Boiling it at the base kitchen makes it clean.
  *  - Mixing raw water into a canteen spoils the whole canteen.
  */
 public class Canteen extends Item {
@@ -75,6 +76,13 @@ public class Canteen extends Item {
 
 	public boolean raw(){
 		return raw;
+	}
+
+	//boils raw water clean, returns false if there was nothing to boil
+	public boolean boil(){
+		if (!raw || sips <= 0) return false;
+		raw = false;
+		return true;
 	}
 
 	public float weight(){
@@ -109,7 +117,7 @@ public class Canteen extends Item {
 			actions.add( AC_FILL );
 			actions.add( AC_SOURCE );
 		}
-		if (OpenWorld.onBase() && raw && sips > 0){
+		if (OpenWorld.onBase() && Facilities.built( Facilities.Facility.KITCHEN ) && raw && sips > 0){
 			actions.add( AC_BOIL );
 		}
 		return actions;

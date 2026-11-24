@@ -1036,6 +1036,7 @@ public abstract class Mob extends Char {
 			rollToDropLoot();
 			//EFPD: open world regional essences
 			com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence.onMobDeath( this );
+			com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material.onMobDeath( this );
 
 			if (cause == Dungeon.hero || cause instanceof Weapon || cause instanceof Weapon.Enchantment){
 				if (Dungeon.hero.hasTalent(Talent.LETHAL_MOMENTUM)

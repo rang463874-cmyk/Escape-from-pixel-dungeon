@@ -68,6 +68,9 @@ public class WndBase extends Window {
 		addButton( Messages.get(this, "map"), new Runnable() { public void run() {
 			hide(); WndWorldMap.show();
 		}});
+		addButton( Messages.get(this, "facilities"), new Runnable() { public void run() {
+			hide(); WndFacilities.show();
+		}});
 		addButton( Messages.get(this, "stash"), new Runnable() { public void run() {
 			hide(); GameScene.show( new WndStash() );
 		}});
