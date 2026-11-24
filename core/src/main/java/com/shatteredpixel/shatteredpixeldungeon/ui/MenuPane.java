@@ -226,8 +226,10 @@ public class MenuPane extends Component {
 			layoutClock();
 			dangerY = clockBG.y + clockBG.height() + 1;
 		}
-		danger.setPos( x + WIDTH - danger.width(), dangerY );
-		danger.setSize( camera.width - danger.width(), danger.height());
+		//EFPD: the tag is widened to the screen edge below, so its width can't be used to place it
+		// once layout runs again (the day/night clock re-lays the pane out whenever its text changes)
+		danger.setPos( x + WIDTH - Tag.SIZE, dangerY );
+		danger.setSize( camera.width - Tag.SIZE, danger.height());
 	}
 
 	private String clockText = "";
