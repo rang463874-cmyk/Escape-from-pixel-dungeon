@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
@@ -595,6 +596,13 @@ public abstract class Level implements Bundlable {
 	//returns true if we immediately transition, false otherwise
 	public boolean activateTransition(Hero hero, LevelTransition transition){
 		if (locked){
+			return false;
+		}
+
+		//EFPD: in open world mode, the up stairs of a region's first floor also lead to the base town
+		if (OpenWorld.isActive() && transition.type == LevelTransition.Type.REGULAR_ENTRANCE
+				&& OpenWorld.isRegionStart(Dungeon.depth, Dungeon.branch)){
+			OpenWorld.showReturnWindow( hero, transition );
 			return false;
 		}
 

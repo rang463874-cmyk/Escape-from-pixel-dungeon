@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
@@ -154,13 +155,25 @@ public class HeroSelectScene extends PixelScene {
 
 				if (GamesInProgress.selectedClass == null) return;
 
-				Dungeon.hero = null;
-				Dungeon.daily = Dungeon.dailyReplay = false;
-				Dungeon.initSeed();
-				ActionIndicator.clearAction();
-				InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+				//EFPD: choose between extraction and open world survival
+				ShatteredPixelDungeon.scene().addToFront( new WndOptions(
+						Messages.get(OpenWorld.class, "mode_title"),
+						Messages.get(OpenWorld.class, "mode_desc"),
+						Messages.get(OpenWorld.class, "mode_extraction"),
+						Messages.get(OpenWorld.class, "mode_openworld") ){
+					@Override
+					protected void onSelect( int index ) {
+						OpenWorld.selectedMode = index == 1;
 
-				Game.switchScene( InterlevelScene.class );
+						Dungeon.hero = null;
+						Dungeon.daily = Dungeon.dailyReplay = false;
+						Dungeon.initSeed();
+						ActionIndicator.clearAction();
+						InterlevelScene.mode = InterlevelScene.Mode.DESCEND;
+
+						Game.switchScene( InterlevelScene.class );
+					}
+				});
 			}
 		};
 		startBtn.icon(Icons.get(Icons.ENTER));
@@ -750,6 +763,8 @@ public class HeroSelectScene extends PixelScene {
 								}
 
 								Dungeon.hero = null;
+								//EFPD: daily runs are always extraction runs
+								OpenWorld.selectedMode = false;
 								Dungeon.daily = true;
 								Dungeon.initSeed();
 								ActionIndicator.clearAction();

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Encumbrance;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
@@ -2264,6 +2265,12 @@ public class Hero extends Char {
 			return;
 		}
 		
+		//EFPD: in open world mode the hero drops a corpse bag and wakes up in the base town
+		if (OpenWorld.isActive()){
+			OpenWorld.onHeroDeath( this, cause );
+			return;
+		}
+
 		Actor.fixTime();
 		super.die( cause );
 		reallyDie( cause );

@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.BaseLevel;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
@@ -263,6 +265,12 @@ public class Dungeon {
 		
 		depth = 1;
 		branch = 0;
+		//EFPD: open world games start in the base town
+		if (OpenWorld.selectedMode){
+			Statistics.efpdOpenWorld = true;
+			depth = OpenWorld.BASE_DEPTH;
+			branch = OpenWorld.BASE_BRANCH;
+		}
 		generatedLevels.clear();
 
 		gold = 0;
@@ -373,6 +381,9 @@ public class Dungeon {
 				default:
 					level = new DeadEndLevel();
 			}
+		} else if (branch == OpenWorld.BASE_BRANCH) {
+			//EFPD: open world base town
+			level = new BaseLevel();
 		} else {
 			level = new DeadEndLevel();
 		}
@@ -482,6 +493,9 @@ public class Dungeon {
 		
 		Dungeon.level = level;
 		hero.pos = pos;
+
+		//EFPD: older corpse bags turn to dust
+		OpenWorld.removeStaleCorpses( level );
 
 		if (hero.buff(AscensionChallenge.class) != null){
 			hero.buff(AscensionChallenge.class).onLevelSwitch();

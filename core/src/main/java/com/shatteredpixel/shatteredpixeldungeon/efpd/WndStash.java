@@ -86,7 +86,7 @@ public class WndStash extends Window {
 		Stash.load();
 		boolean canWithdraw = Stash.canWithdraw();
 
-		subtitle.text( Messages.get(this, Statistics.efpdInHideout ? "hideout" : canWithdraw ? "can_withdraw" : "locked") );
+		subtitle.text( Messages.get(this, OpenWorld.onBase() ? "base" : Statistics.efpdInHideout ? "hideout" : canWithdraw ? "can_withdraw" : "locked") );
 
 		grid.clear();
 		if (Stash.items.isEmpty()){

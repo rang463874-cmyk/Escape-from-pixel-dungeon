@@ -213,6 +213,25 @@ public class WndDevTools extends Window {
 			}
 		});
 
+		//debug actions
+		list.addTitle( Messages.get(this, "cat_debug") );
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.POTION_CRIMSON), Messages.get(this, "heal") ){
+			@Override protected void give() {
+				Dungeon.hero.HP = Dungeon.hero.HT;
+				Injuries injuries = Dungeon.hero.buff( Injuries.class );
+				if (injuries != null) injuries.healAll();
+				com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.detach( Dungeon.hero, Hemorrhage.class );
+				GLog.p( Messages.get(WndDevTools.class, "healed") );
+			}
+		});
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.TOMB), Messages.get(this, "die") ){
+			@Override protected void give() {
+				hide();
+				Dungeon.hero.HP = 0;
+				Dungeon.hero.die( WndDevTools.class );
+			}
+		});
+
 		//melee weapons and guns, by tier
 		ArrayList<Class<?>> guns = new ArrayList<>();
 		for (int t = 0; t < Generator.wepTiers.length; t++){

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -147,6 +148,15 @@ public class SewerLevel extends RegularLevel {
 	@Override
 	public boolean activateTransition(Hero hero, LevelTransition transition) {
 		if (transition.type == LevelTransition.Type.SURFACE){
+			//EFPD: in open world mode the surface is the base town
+			if (OpenWorld.isActive()){
+				if (hero.belongings.getItem( Amulet.class ) != null){
+					OpenWorld.recordSurvival( hero );
+				} else {
+					OpenWorld.showReturnWindow( hero, null );
+				}
+				return false;
+			}
 			if (hero.belongings.getItem( Amulet.class ) == null) {
 				//EFPD: the dungeon entrance is the extraction point / hideout door
 				Extraction.showEntranceWindow( hero );

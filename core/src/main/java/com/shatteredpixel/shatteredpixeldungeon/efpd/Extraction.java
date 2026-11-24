@@ -80,13 +80,23 @@ public class Extraction {
 	//called whenever a boss dies (GameScene.bossSlain)
 	public static void onBossSlain(){
 		if (Dungeon.branch == 0 && Dungeon.bossLevel()){
+			boolean first = (Statistics.efpdBossesCleared & (1 << Dungeon.depth)) == 0;
 			Statistics.efpdBossesCleared |= 1 << Dungeon.depth;
-			GLog.p( Messages.get(Extraction.class, "boss_exit_open") );
+			if (OpenWorld.isActive()){
+				//open world: the next region opens on the region map
+				int next = OpenWorld.regionOf(Dungeon.depth) + 1;
+				if (first && next < OpenWorld.REGION_START.length){
+					GLog.p( Messages.get(OpenWorld.class, "region_unlocked", Messages.get(OpenWorld.class, "region_" + next)) );
+				}
+			} else {
+				GLog.p( Messages.get(Extraction.class, "boss_exit_open") );
+			}
 		}
 	}
 
 	public static boolean bossExitAvailable( Hero hero, LevelTransition transition ){
-		return transition.type == LevelTransition.Type.REGULAR_ENTRANCE
+		return !OpenWorld.isActive()
+				&& transition.type == LevelTransition.Type.REGULAR_ENTRANCE
 				&& Dungeon.branch == 0
 				&& Dungeon.bossLevel()
 				&& (Statistics.efpdBossesCleared & (1 << Dungeon.depth)) != 0

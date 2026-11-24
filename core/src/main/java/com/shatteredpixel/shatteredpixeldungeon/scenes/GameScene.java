@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.WndHideout;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
@@ -629,11 +630,11 @@ public class GameScene extends PixelScene {
 		if (InterlevelScene.mode != InterlevelScene.Mode.NONE) {
 			if (Dungeon.depth == Statistics.deepestFloor
 					&& (InterlevelScene.mode == InterlevelScene.Mode.DESCEND || InterlevelScene.mode == InterlevelScene.Mode.FALL)) {
-				GLog.h(Messages.get(this, "descend"), Dungeon.depth);
+				if (!OpenWorld.onBase()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
 				Sample.INSTANCE.play(Assets.Sounds.DESCEND);
 
 				//EFPD: remind the player about the stash at the start of a raid
-				if (Stash.canWithdraw() && !Stash.isEmpty()){
+				if (!OpenWorld.isActive() && Stash.canWithdraw() && !Stash.isEmpty()){
 					GLog.p(Messages.get(Stash.class, "hint"));
 				}
 				
@@ -665,7 +666,7 @@ public class GameScene extends PixelScene {
 				GLog.h(Messages.get(this, "warp"));
 			} else if (InterlevelScene.mode == InterlevelScene.Mode.RESURRECT) {
 				GLog.h(Messages.get(this, "resurrect"), Dungeon.depth);
-			} else {
+			} else if (!OpenWorld.onBase()) {
 				GLog.h(Messages.get(this, "return"), Dungeon.depth);
 			}
 
@@ -745,6 +746,11 @@ public class GameScene extends PixelScene {
 				GLog.w(Messages.get(DimensionalSundial.class, "warning"));
 			} else {
 				DimensionalSundial.sundialWarned = false;
+			}
+
+			//EFPD: arriving in the open world base town
+			if (OpenWorld.onBase()){
+				GLog.p(Messages.get(OpenWorld.class, "at_base"));
 			}
 
 			InterlevelScene.mode = InterlevelScene.Mode.NONE;

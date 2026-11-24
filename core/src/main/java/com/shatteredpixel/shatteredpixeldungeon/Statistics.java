@@ -53,6 +53,14 @@ public class Statistics {
 	public static int efpdBossesCleared;
 	//EFPD: true after extracting, while the hero manages loot in the hideout
 	public static boolean efpdInHideout;
+	//EFPD open world mode
+	public static boolean efpdOpenWorld;
+	public static int efpdCorpseId;          //id of the current corpse bag, older bags turn to dust
+	public static int efpdCorpseDepth = -1;  //where the current corpse bag lies, -1 if none
+	public static int efpdCorpseBranch;
+	public static int efpdDeaths;
+	public static boolean efpdSurvived;      //the amulet was brought back
+	public static int efpdSurvivedTurn;
 	public static int totalBossScore;
 	public static int[] questScores = new int[5];
 	public static int totalQuestScore;
@@ -102,6 +110,13 @@ public class Statistics {
 		bossScores      = new int[5];
 		efpdBossesCleared = 0;
 		efpdInHideout = false;
+		efpdOpenWorld = false;
+		efpdCorpseId = 0;
+		efpdCorpseDepth = -1;
+		efpdCorpseBranch = 0;
+		efpdDeaths = 0;
+		efpdSurvived = false;
+		efpdSurvivedTurn = 0;
 		totalBossScore  = 0;
 		questScores     = new int[5];
 		totalQuestScore = 0;
@@ -148,6 +163,13 @@ public class Statistics {
 	private static final String BOSS_SCORES		= "boss_scores";
 	private static final String EFPD_BOSSES		= "efpd_bosses_cleared";
 	private static final String EFPD_HIDEOUT	= "efpd_in_hideout";
+	private static final String EFPD_OPENWORLD	= "efpd_open_world";
+	private static final String EFPD_CORPSE_ID	= "efpd_corpse_id";
+	private static final String EFPD_CORPSE_D	= "efpd_corpse_depth";
+	private static final String EFPD_CORPSE_B	= "efpd_corpse_branch";
+	private static final String EFPD_DEATHS		= "efpd_deaths";
+	private static final String EFPD_SURVIVED	= "efpd_survived";
+	private static final String EFPD_SURV_TURN	= "efpd_survived_turn";
 	private static final String TOT_BOSS		= "tot_boss";
 	private static final String QUEST_SCORES	= "quest_scores";
 	private static final String TOT_QUEST		= "tot_quest";
@@ -198,6 +220,13 @@ public class Statistics {
 		bundle.put( BOSS_SCORES, bossScores );
 		bundle.put( EFPD_BOSSES, efpdBossesCleared );
 		bundle.put( EFPD_HIDEOUT, efpdInHideout );
+		bundle.put( EFPD_OPENWORLD, efpdOpenWorld );
+		bundle.put( EFPD_CORPSE_ID, efpdCorpseId );
+		bundle.put( EFPD_CORPSE_D, efpdCorpseDepth );
+		bundle.put( EFPD_CORPSE_B, efpdCorpseBranch );
+		bundle.put( EFPD_DEATHS, efpdDeaths );
+		bundle.put( EFPD_SURVIVED, efpdSurvived );
+		bundle.put( EFPD_SURV_TURN, efpdSurvivedTurn );
 		bundle.put( TOT_BOSS,    totalBossScore );
 		bundle.put( QUEST_SCORES,questScores );
 		bundle.put( TOT_QUEST,   totalQuestScore );
@@ -254,6 +283,13 @@ public class Statistics {
 		else                                bossScores = new int[5];
 		efpdBossesCleared = bundle.getInt( EFPD_BOSSES );
 		efpdInHideout = bundle.getBoolean( EFPD_HIDEOUT );
+		efpdOpenWorld = bundle.getBoolean( EFPD_OPENWORLD );
+		efpdCorpseId = bundle.getInt( EFPD_CORPSE_ID );
+		efpdCorpseDepth = bundle.contains( EFPD_CORPSE_D ) ? bundle.getInt( EFPD_CORPSE_D ) : -1;
+		efpdCorpseBranch = bundle.getInt( EFPD_CORPSE_B );
+		efpdDeaths = bundle.getInt( EFPD_DEATHS );
+		efpdSurvived = bundle.getBoolean( EFPD_SURVIVED );
+		efpdSurvivedTurn = bundle.getInt( EFPD_SURV_TURN );
 		totalBossScore  = bundle.getInt( TOT_BOSS );
 		if (bundle.contains( QUEST_SCORES ))questScores = bundle.getIntArray( QUEST_SCORES );
 		else                                questScores = new int[5];

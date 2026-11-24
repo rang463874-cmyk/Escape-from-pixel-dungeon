@@ -127,6 +127,8 @@ public class Stash {
 	public static boolean canWithdraw(){
 		//in the hideout withdrawn items go back into the stash when the hero finishes up
 		if (Statistics.efpdInHideout) return true;
+		//open world: only in the base town
+		if (OpenWorld.isActive()) return OpenWorld.onBase();
 		return Dungeon.depth == 1 && Dungeon.branch == 0 && Statistics.deepestFloor <= 1;
 	}
 
@@ -205,6 +207,46 @@ public class Stash {
 
 		i.identify(false);
 		return true;
+	}
+
+	//whether a single item can be put into the stash (open world base)
+	public static boolean canDeposit( Item item ){
+		if (item instanceof Bag || !stashable( item )) return false;
+		return item.quantity() > Math.min( item.starterQuantity, item.quantity() );
+	}
+
+	/** Puts one carried item (or its non-starting-kit units) into the stash. */
+	public static boolean depositOne( Hero hero, Item item ){
+		if (!canDeposit( item )) return false;
+		load();
+
+		int keep = item.quantity() - Math.min( item.starterQuantity, item.quantity() );
+		Item stored;
+		if (keep < item.quantity()){
+			//starting kit units stay with the hero
+			stored = item.duplicate();
+			stored.quantity( keep );
+			stored.starterQuantity = 0;
+			item.quantity( item.quantity() - keep );
+			Item.updateQuickslot();
+		} else {
+			stored = item.detachAll( hero.belongings.backpack );
+		}
+
+		if (!prepareForStash( stored )) return false;
+		items.add( stored );
+		save();
+		saveRun();
+		return true;
+	}
+
+	public static void depositGold(){
+		load();
+		gold += Dungeon.gold;
+		Dungeon.gold = 0;
+		save();
+		Item.updateQuickslot();
+		saveRun();
 	}
 
 	/** Removes an item from the stash and gives it to the hero. */
