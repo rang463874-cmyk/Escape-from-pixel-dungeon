@@ -83,10 +83,13 @@ public class Extraction {
 			boolean first = (Statistics.efpdBossesCleared & (1 << Dungeon.depth)) == 0;
 			Statistics.efpdBossesCleared |= 1 << Dungeon.depth;
 			if (OpenWorld.isActive()){
+				Statistics.efpdBossKills++;
 				//open world: the next region opens on the region map
 				int next = OpenWorld.regionOf(Dungeon.depth) + 1;
 				if (first && next < OpenWorld.REGION_START.length){
 					GLog.p( Messages.get(OpenWorld.class, "region_unlocked", Messages.get(OpenWorld.class, "region_" + next)) );
+				} else if (!first){
+					GLog.p( Messages.get(Regen.class, "boss_again", Regen.BOSS_REGEN_TURNS / DayNight.DAY_LENGTH) );
 				}
 			} else {
 				GLog.p( Messages.get(Extraction.class, "boss_exit_open") );

@@ -61,6 +61,7 @@ public class Statistics {
 	public static int efpdDeaths;
 	public static boolean efpdSurvived;      //the amulet was brought back
 	public static int efpdSurvivedTurn;
+	public static int efpdBossKills;         //every boss kill, respawned bosses included
 	public static int totalBossScore;
 	public static int[] questScores = new int[5];
 	public static int totalQuestScore;
@@ -117,8 +118,10 @@ public class Statistics {
 		efpdDeaths = 0;
 		efpdSurvived = false;
 		efpdSurvivedTurn = 0;
+		efpdBossKills = 0;
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.reset();
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.reset();
 		totalBossScore  = 0;
 		questScores     = new int[5];
 		totalQuestScore = 0;
@@ -172,6 +175,7 @@ public class Statistics {
 	private static final String EFPD_DEATHS		= "efpd_deaths";
 	private static final String EFPD_SURVIVED	= "efpd_survived";
 	private static final String EFPD_SURV_TURN	= "efpd_survived_turn";
+	private static final String EFPD_BOSS_KILLS	= "efpd_boss_kills";
 	private static final String TOT_BOSS		= "tot_boss";
 	private static final String QUEST_SCORES	= "quest_scores";
 	private static final String TOT_QUEST		= "tot_quest";
@@ -229,8 +233,10 @@ public class Statistics {
 		bundle.put( EFPD_DEATHS, efpdDeaths );
 		bundle.put( EFPD_SURVIVED, efpdSurvived );
 		bundle.put( EFPD_SURV_TURN, efpdSurvivedTurn );
+		bundle.put( EFPD_BOSS_KILLS, efpdBossKills );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.storeInBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.storeInBundle( bundle );
 		bundle.put( TOT_BOSS,    totalBossScore );
 		bundle.put( QUEST_SCORES,questScores );
 		bundle.put( TOT_QUEST,   totalQuestScore );
@@ -294,8 +300,10 @@ public class Statistics {
 		efpdDeaths = bundle.getInt( EFPD_DEATHS );
 		efpdSurvived = bundle.getBoolean( EFPD_SURVIVED );
 		efpdSurvivedTurn = bundle.getInt( EFPD_SURV_TURN );
+		efpdBossKills = bundle.getInt( EFPD_BOSS_KILLS );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.restoreFromBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.restoreFromBundle( bundle );
 		totalBossScore  = bundle.getInt( TOT_BOSS );
 		if (bundle.contains( QUEST_SCORES ))questScores = bundle.getIntArray( QUEST_SCORES );
 		else                                questScores = new int[5];
@@ -325,6 +333,7 @@ public class Statistics {
 	public static void preview( GamesInProgress.Info info, Bundle bundle ){
 		info.goldCollected  = bundle.getInt( GOLD );
 		info.maxDepth       = bundle.getInt( DEEPEST );
+		info.efpdOpenWorld  = bundle.getBoolean( EFPD_OPENWORLD );
 	}
 
 }

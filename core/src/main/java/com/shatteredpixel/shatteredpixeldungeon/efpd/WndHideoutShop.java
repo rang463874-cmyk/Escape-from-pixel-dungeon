@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.RecallCharm;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -41,6 +42,8 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Image;
 import com.watabou.utils.Reflection;
 
+import java.util.ArrayList;
+
 /**
  * Fixed stock sold at the hideout. Bought items go into the hero's inventory,
  * and into the stash when the hero finishes up.
@@ -50,9 +53,24 @@ public class WndHideoutShop extends WndOptions {
 	//stock and prices, edit here to change what the hideout sells
 	private static final Class<?>[] STOCK    = { Bandage.class, Splint.class, FirstAidKit.class, Food.class, PotionOfHealing.class,
 	                                             LightAmmo.class, RifleAmmo.class, ShotgunShell.class,
-	                                             Canteen.class };
-	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50,   60 };
-	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6,    1  };
+	                                             Canteen.class, RecallCharm.class };
+	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50,   60, 150 };
+	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6,    1,  1   };
+	//only sold in open world mode
+	private static final boolean[]  OPEN_WORLD_ONLY = { false, false, false, false, false, false, false, false, true, true };
+
+	//stock indices on display; set before the window is built, since WndOptions asks for its
+	//buttons from its own constructor
+	private static int[] shown = new int[0];
+
+	private static void pickStock(){
+		ArrayList<Integer> list = new ArrayList<>();
+		for (int i = 0; i < STOCK.length; i++){
+			if (!OPEN_WORLD_ONLY[i] || OpenWorld.isActive()) list.add( i );
+		}
+		shown = new int[list.size()];
+		for (int i = 0; i < shown.length; i++) shown[i] = list.get(i);
+	}
 
 	private static Item make( int i ){
 		Item item = (Item) Reflection.newInstance( STOCK[i] );
@@ -63,13 +81,15 @@ public class WndHideoutShop extends WndOptions {
 	}
 
 	private static String[] labels(){
-		String[] labels = new String[STOCK.length + 1];
-		for (int i = 0; i < STOCK.length; i++){
+		pickStock();
+		String[] labels = new String[shown.length + 1];
+		for (int n = 0; n < shown.length; n++){
+			int i = shown[n];
 			String name = Messages.titleCase(make(i).name());
 			if (QUANTITY[i] > 1) name += " x" + QUANTITY[i];
-			labels[i] = Messages.get(WndHideoutShop.class, "entry", name, PRICES[i]);
+			labels[n] = Messages.get(WndHideoutShop.class, "entry", name, PRICES[i]);
 		}
-		labels[STOCK.length] = Messages.get(WndHideoutShop.class, "back");
+		labels[shown.length] = Messages.get(WndHideoutShop.class, "back");
 		return labels;
 	}
 
@@ -82,25 +102,25 @@ public class WndHideoutShop extends WndOptions {
 
 	@Override
 	protected boolean enabled( int index ) {
-		return index >= STOCK.length || Dungeon.gold >= PRICES[index];
+		return index >= shown.length || Dungeon.gold >= PRICES[shown[index]];
 	}
 
 	@Override
 	protected boolean hasIcon( int index ) {
-		return index < STOCK.length;
+		return index < shown.length;
 	}
 
 	@Override
 	protected Image getIcon( int index ) {
-		return new ItemSprite( make(index) );
+		return new ItemSprite( make(shown[index]) );
 	}
 
 	@Override
 	protected void onSelect( int index ) {
-		if (index >= STOCK.length || Dungeon.gold < PRICES[index]) return;
+		if (index >= shown.length || Dungeon.gold < PRICES[shown[index]]) return;
 
-		Dungeon.gold -= PRICES[index];
-		Item item = make(index);
+		Dungeon.gold -= PRICES[shown[index]];
+		Item item = make(shown[index]);
 		if (!item.collect()){
 			Dungeon.level.drop( item, Dungeon.hero.pos ).sprite.drop();
 		}

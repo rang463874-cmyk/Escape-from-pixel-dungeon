@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.RecallCharm;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
@@ -119,6 +120,7 @@ public class Weight {
 		//open world materials
 		if (item instanceof Essence)        return 0.1f;
 		if (item instanceof Material)       return ((Material) item).unitWeight();
+		if (item instanceof RecallCharm)    return 0.1f;
 		if (item instanceof Tonic)          return 0.4f;
 
 		//misc

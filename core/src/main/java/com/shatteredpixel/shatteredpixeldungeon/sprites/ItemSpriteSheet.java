@@ -890,11 +890,13 @@ public class ItemSpriteSheet {
 	public static final int MAT_WOOD  = EFPD_MATERIALS+1;
 	public static final int MAT_STONE = EFPD_MATERIALS+2;
 	public static final int MAT_METAL = EFPD_MATERIALS+3;
+	public static final int RECALL_CHARM = EFPD_MATERIALS+4;
 	static{
 		assignItemRect(MAT_CLOTH, 10, 9);
 		assignItemRect(MAT_WOOD,  12, 8);
 		assignItemRect(MAT_STONE, 11, 8);
 		assignItemRect(MAT_METAL, 12, 6);
+		assignItemRect(RECALL_CHARM, 10, 12);
 	}
 
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots

@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.RecallCharm;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Essence;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
@@ -304,7 +305,7 @@ public class WndDevTools extends Window {
 		addCategory( list, Messages.get(this, "cat_openworld"), Arrays.asList( Essence.Sewers.class, Essence.Prison.class,
 				Essence.Caves.class, Essence.City.class, Essence.Halls.class, Tonic.Strength.class, Tonic.Vitality.class,
 				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class, Material.Cloth.class, Material.Wood.class,
-				Material.StoneBlock.class, Material.RefinedMetal.class ) );
+				Material.StoneBlock.class, Material.RefinedMetal.class, RecallCharm.class ) );
 		addCategory( list, Messages.get(this, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
 		addCategory( list, Messages.get(this, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
 				Stylus.class, ArcaneResin.class ) );

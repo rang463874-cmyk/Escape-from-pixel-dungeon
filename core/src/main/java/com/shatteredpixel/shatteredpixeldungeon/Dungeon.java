@@ -303,7 +303,16 @@ public class Dungeon {
 		return (challenges & mask) != 0;
 	}
 
+	//EFPD: whether an open world dungeon floor exists (without triggering regeneration)
+	public static boolean levelVisitedOW(int depth){
+		return generatedLevels.contains(depth);
+	}
+
 	public static boolean levelHasBeenGenerated(int depth, int branch){
+		//EFPD: open world floors left alone long enough are built anew
+		if (generatedLevels.contains(depth + 1000*branch) && com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.shouldRegenerate(depth, branch)){
+			return false;
+		}
 		return generatedLevels.contains(depth + 1000*branch);
 	}
 	
@@ -443,7 +452,8 @@ public class Dungeon {
 			long result = Random.Long();
 
 		Random.popGenerator();
-		return result;
+		//EFPD: regenerated open world floors get a fresh seed
+		return com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.seedFor(depth, branch, result);
 	}
 	
 	public static boolean shopOnLevel() {
@@ -716,6 +726,8 @@ public class Dungeon {
 	}
 	
 	public static void saveLevel( int save ) throws IOException {
+		//EFPD: the hero was on this floor until now
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.markVisit();
 		Bundle bundle = new Bundle();
 		bundle.put( LEVEL, level );
 		

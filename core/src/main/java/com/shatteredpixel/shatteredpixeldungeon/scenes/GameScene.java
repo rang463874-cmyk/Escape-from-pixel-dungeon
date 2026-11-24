@@ -752,6 +752,11 @@ public class GameScene extends PixelScene {
 			if (OpenWorld.onBase()){
 				GLog.p(Messages.get(OpenWorld.class, "at_base"));
 			}
+			//EFPD: arriving on a floor that has regrown
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.consumeNotice()){
+				GLog.w(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.class,
+						Dungeon.bossLevel() ? "regrown_boss" : "regrown"));
+			}
 
 			InterlevelScene.mode = InterlevelScene.Mode.NONE;
 

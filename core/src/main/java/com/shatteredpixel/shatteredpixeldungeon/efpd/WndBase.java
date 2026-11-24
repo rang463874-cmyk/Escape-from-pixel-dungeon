@@ -71,6 +71,9 @@ public class WndBase extends Window {
 		addButton( Messages.get(this, "facilities"), new Runnable() { public void run() {
 			hide(); WndFacilities.show();
 		}});
+		addButton( Messages.get(WndSurvivalRecord.class, "title"), new Runnable() { public void run() {
+			hide(); GameScene.show( new WndSurvivalRecord() );
+		}});
 		addButton( Messages.get(this, "stash"), new Runnable() { public void run() {
 			hide(); GameScene.show( new WndStash() );
 		}});

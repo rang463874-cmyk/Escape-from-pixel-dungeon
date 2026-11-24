@@ -186,6 +186,7 @@ public class GamesInProgress {
 		public boolean daily;
 		public boolean dailyReplay;
 		public long lastPlayed;
+		public boolean efpdOpenWorld; //EFPD
 
 		public int level;
 		public int str;

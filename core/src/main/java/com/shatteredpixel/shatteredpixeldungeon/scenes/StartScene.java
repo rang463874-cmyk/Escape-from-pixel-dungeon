@@ -178,6 +178,8 @@ public class StartScene extends PixelScene {
 		
 		private int slot;
 		private boolean newGame;
+		//EFPD: grass along the bottom marks open world saves
+		private java.util.ArrayList<Image> grass = new java.util.ArrayList<>();
 		
 		@Override
 		protected void createChildren() {
@@ -197,6 +199,18 @@ public class StartScene extends PixelScene {
 			this.slot = slot;
 			GamesInProgress.Info info = GamesInProgress.check(slot);
 			newGame = info == null;
+			for (Image g : grass) remove( g );
+			grass.clear();
+			if (info != null && info.efpdOpenWorld){
+				//enough tiles for the widest slot, extras are hidden in layout
+				for (int i = 0; i < 8; i++){
+					Image g = new Image( com.shatteredpixel.shatteredpixeldungeon.Assets.Interfaces.EFPD_GRASS );
+					grass.add( g );
+					//behind the text, but in front of the frame
+					addToBack( g );
+				}
+				addToBack( bg );
+			}
 			if (newGame){
 				name.text( Messages.get(StartScene.class, "new"));
 				
@@ -294,6 +308,21 @@ public class StartScene extends PixelScene {
 			bg.x = x;
 			bg.y = y;
 			bg.size( width, height );
+
+			float gx = x + 3;
+			for (Image g : grass){
+				float right = x + width - 3;
+				g.visible = gx < right;
+				if (g.visible){
+					//crop the last tile so the grass stays inside the frame
+					int w = (int)Math.min( g.texture.width, right - gx );
+					g.frame( 0, 0, w, g.texture.height );
+					g.x = gx;
+					g.y = y + height - g.height() - 1;
+					align( g );
+				}
+				gx += g.texture.width;
+			}
 			
 			if (hero != null){
 				hero.x = x+8;
