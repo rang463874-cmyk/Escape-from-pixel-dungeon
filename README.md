@@ -83,7 +83,7 @@
 - [x] 보스 층 탈출 지점, 시작 장비·가방 저장 제외
 - [x] 무게 기반 인벤토리 / 과적 페널티
 - [x] 부상·출혈 상태이상과 치료 아이템
-- [ ] 오픈월드 생존 모드 (영구 스탯 성장)
+- [ ] 오픈월드 생존 모드 (영구 스탯 성장) — 기획서: [docs/design/open-world-survival.md](docs/design/open-world-survival.md)
 
 ## 빌드 (데스크톱)
 
