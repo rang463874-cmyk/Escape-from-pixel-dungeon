@@ -40,6 +40,10 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndStory;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndTitledMessage;
 import com.watabou.input.GameAction;
 import com.watabou.noosa.BitmapText;
+import com.watabou.noosa.ColorBlock;
+import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.DayNight;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.NinePatch;
@@ -65,6 +69,9 @@ public class MenuPane extends Component {
 	private Toolbar.PickedUpItem pickedUp;
 
 	private BitmapText version;
+	//EFPD: open world day / night clock
+	private RenderedTextBlock clock;
+	private ColorBlock clockBG;
 	private NinePatch versionOverflowBG;
 
 	private DangerIndicator danger;
@@ -147,6 +154,13 @@ public class MenuPane extends Component {
 		btnMenu = new MenuButton();
 		add( btnMenu );
 
+		if (OpenWorld.isActive()){
+			clockBG = new ColorBlock( 1, 1, 0xAA000000 );
+			add( clockBG );
+			clock = PixelScene.renderTextBlock( DayNight.label(), 6 );
+			add( clock );
+		}
+
 		danger = new DangerIndicator();
 		add( danger );
 
@@ -207,8 +221,38 @@ public class MenuPane extends Component {
 			challengeButton.setRect(challengeIcon.x, challengeIcon.y, challengeIcon.width(), challengeIcon.height() + challengeText.height());
 		}
 
-		danger.setPos( x + WIDTH - danger.width(), y + bg.height + 1 );
+		float dangerY = y + bg.height + 1;
+		if (clock != null){
+			layoutClock();
+			dangerY = clockBG.y + clockBG.height() + 1;
+		}
+		danger.setPos( x + WIDTH - danger.width(), dangerY );
 		danger.setSize( camera.width - danger.width(), danger.height());
+	}
+
+	private String clockText = "";
+
+	private void layoutClock(){
+		clockBG.size( clock.width() + 4, clock.height() + 2 );
+		clockBG.x = x + WIDTH - clockBG.width();
+		clockBG.y = y + bg.height + 1;
+		clock.setPos( clockBG.x + 2, clockBG.y + 1 );
+		PixelScene.align( clock );
+	}
+
+	@Override
+	public synchronized void update() {
+		super.update();
+		if (clock != null){
+			DayNight.checkTransition();
+			String text = DayNight.label();
+			if (!text.equals( clockText )){
+				clockText = text;
+				clock.text( text );
+				clock.hardlight( DayNight.color() );
+				layout();
+			}
+		}
 	}
 
 	public void pickup(Item item, int cell) {

@@ -120,6 +120,16 @@ public abstract class ChampionEnemy extends Buff {
 			if (m.state != m.PASSIVE) {
 				m.state = m.WANDERING;
 			}
+		//EFPD: open world nights bring out champion enemies
+		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.DayNight.isNight()
+				&& Random.Float() < com.shatteredpixel.shatteredpixeldungeon.efpd.DayNight.NIGHT_CHAMPION
+				&& m.buff(ChampionEnemy.class) == null
+				&& !Char.hasProp(m, Char.Property.BOSS) && !Char.hasProp(m, Char.Property.MINIBOSS)) {
+			if (m instanceof Crab  && Dungeon.scalingDepth() <= 3) return;
+			if (m instanceof Thief && Dungeon.scalingDepth() <= 4) return;
+			if (m instanceof Guard && Dungeon.scalingDepth() <= 7) return;
+			if (m instanceof Bat   && Dungeon.scalingDepth() <= 9) return;
+			Buff.affect(m, buffCls);
 		}
 	}
 

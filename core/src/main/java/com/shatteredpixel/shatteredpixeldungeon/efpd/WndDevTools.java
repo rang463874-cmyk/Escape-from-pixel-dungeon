@@ -235,6 +235,14 @@ public class WndDevTools extends Window {
 			}
 		});
 
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.ARTIFACT_HOURGLASS), Messages.get(this, "skip_time") ){
+			@Override protected void give() {
+				//moves the world clock only, buffs and hunger don't advance
+				com.shatteredpixel.shatteredpixeldungeon.Statistics.duration += 300 * quantity;
+				GLog.i( DayNight.label() );
+				Dungeon.observe();
+			}
+		});
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.CANTEEN), Messages.get(this, "thirst") ){
 			@Override protected void give() {
 				Thirst t = Dungeon.hero.buff( Thirst.class );

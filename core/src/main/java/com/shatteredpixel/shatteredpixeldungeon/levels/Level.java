@@ -789,6 +789,8 @@ public abstract class Level implements Bundlable {
 		} else {
 			cooldown = TIME_TO_RESPAWN;
 		}
+		//EFPD: enemies respawn faster at night in the open world
+		cooldown /= com.shatteredpixel.shatteredpixeldungeon.efpd.DayNight.respawnMultiplier();
 		return cooldown / DimensionalSundial.spawnMultiplierAtCurrentTime();
 	}
 
@@ -1393,6 +1395,8 @@ public abstract class Level implements Bundlable {
 				viewDist *= EyeOfNewt.visionRangeMultiplier();
 				//EFPD: head injuries reduce vision
 				viewDist *= Injuries.visionMultiplier(c);
+				//EFPD: open world nights are dark
+				viewDist *= com.shatteredpixel.shatteredpixeldungeon.efpd.DayNight.visionMultiplier(c);
 			}
 			
 			ShadowCaster.castShadow( cx, cy, width(), fieldOfView, blocking, Math.round(viewDist) );
