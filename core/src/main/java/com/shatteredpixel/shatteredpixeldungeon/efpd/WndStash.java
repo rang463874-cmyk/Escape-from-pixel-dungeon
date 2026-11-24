@@ -130,7 +130,7 @@ public class WndStash extends Window {
 		final boolean canWithdraw = Stash.canWithdraw();
 		GameScene.show( new WndOptions( new ItemSprite(item),
 				Messages.titleCase( item.title() ),
-				item.info(),
+				item.info() + "\n\n" + Weight.infoLine(item),
 				Messages.get(WndStash.class, "take") ){
 			@Override
 			protected boolean enabled(int index) {

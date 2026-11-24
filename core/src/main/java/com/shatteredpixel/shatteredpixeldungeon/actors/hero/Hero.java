@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Encumbrance;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Bones;
@@ -346,6 +348,11 @@ public class Hero extends Char {
 		STR = bundle.getInt( STRENGTH );
 
 		belongings.restoreFromBundle( bundle );
+
+		//EFPD: saves made before the weight system existed
+		if (buff(Encumbrance.class) == null){
+			new Encumbrance().attachTo(this);
+		}
 	}
 	
 	public static void preview( GamesInProgress.Info info, Bundle bundle ) {
@@ -455,6 +462,8 @@ public class Hero extends Char {
 		}
 		Buff.affect( this, Regeneration.class );
 		Buff.affect( this, Hunger.class );
+		//EFPD: weight based inventory
+		Buff.affect( this, Encumbrance.class );
 	}
 	
 	public int tier() {
@@ -598,6 +607,9 @@ public class Hero extends Char {
 			evasion /= 2;
 		}
 
+		//EFPD: carrying too much makes the hero easier to hit
+		evasion *= Weight.evasionMultiplier(this);
+
 		if (belongings.armor() != null) {
 			evasion = belongings.armor().evasionFactor(this, evasion);
 
@@ -735,6 +747,9 @@ public class Hero extends Char {
 		}
 
 		speed = AscensionChallenge.modifyHeroSpeed(speed);
+
+		//EFPD: carrying too much slows the hero down
+		speed *= Weight.speedMultiplier(this);
 		
 		return speed;
 		

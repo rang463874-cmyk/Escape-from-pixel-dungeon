@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
@@ -228,8 +229,9 @@ public class WndBag extends WndTabbed {
 		}
 
 		String title = selector != null ? selector.textPrompt() : null;
+		//EFPD: show carried weight next to the bag name
 		RenderedTextBlock txtTitle = PixelScene.renderTextBlock(
-				title != null ? Messages.titleCase(title) : Messages.titleCase( bag.name() ), 8 );
+				title != null ? Messages.titleCase(title) : Messages.titleCase( bag.name() ) + "  " + Weight.label(Dungeon.hero), 8 );
 		txtTitle.hardlight( TITLE_COLOR );
 		txtTitle.maxWidth( (int)titleWidth - 2 );
 		txtTitle.setPos(

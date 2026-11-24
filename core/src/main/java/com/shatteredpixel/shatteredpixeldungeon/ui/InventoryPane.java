@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.ui;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
@@ -76,6 +77,7 @@ public class InventoryPane extends Component {
 	private BitmapText goldTxt;
 	private Image energy;
 	private BitmapText energyTxt;
+	private BitmapText weightTxt; //EFPD
 	private RenderedTextBlock promptTxt;
 
 	private ArrayList<BagButton> bags;
@@ -171,6 +173,9 @@ public class InventoryPane extends Component {
 		energyTxt.hardlight(0x44CCFF);
 		add(energyTxt);
 
+		weightTxt = new BitmapText(PixelScene.pixelFont);
+		add(weightTxt);
+
 		promptTxt = PixelScene.renderTextBlock(6);
 		promptTxt.hardlight(Window.TITLE_COLOR);
 		add(promptTxt);
@@ -238,6 +243,10 @@ public class InventoryPane extends Component {
 
 		energy.x = energyTxt.x + energyTxt.width() + 1;
 		energy.y = energyTxt.y;
+
+		weightTxt.x = (energy.visible ? energy.x + energy.width() : gold.x + gold.width()) + 3;
+		weightTxt.y = y+5.5f;
+		PixelScene.align(weightTxt);
 
 		for (BagButton b : bags){
 			b.setRect(left, y + 14, SLOT_WIDTH, 14);
@@ -338,12 +347,19 @@ public class InventoryPane extends Component {
 			energyTxt.text(Integer.toString(Dungeon.energy));
 			energyTxt.measure();
 			energyTxt.visible = energy.visible = Dungeon.energy > 0;
+
+			//EFPD: carried weight, coloured by load level
+			weightTxt.text(Weight.label(Dungeon.hero));
+			weightTxt.measure();
+			weightTxt.hardlight(Weight.LEVEL_COLORS[Weight.level(Dungeon.hero)]);
+			weightTxt.visible = true;
 		} else {
 			promptTxt.text(selector.textPrompt());
 			promptTxt.visible = true;
 
 			goldTxt.visible = gold.visible = false;
 			energyTxt.visible = energy.visible = false;
+			weightTxt.visible = false;
 		}
 
 		ArrayList<Bag> inventBags = stuff.getBags();

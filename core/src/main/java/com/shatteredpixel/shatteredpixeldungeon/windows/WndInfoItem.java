@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
@@ -97,7 +98,10 @@ public class WndInfoItem extends Window {
 		IconTitle titlebar = new IconTitle( item );
 		titlebar.color( color );
 		
-		RenderedTextBlock txtInfo = PixelScene.renderTextBlock( item.info(), 6 );
+		String info = item.info();
+		//EFPD: show item weight
+		info += "\n\n" + Weight.infoLine(item);
+		RenderedTextBlock txtInfo = PixelScene.renderTextBlock( info, 6 );
 		
 		layoutFields(titlebar, txtInfo);
 	}
