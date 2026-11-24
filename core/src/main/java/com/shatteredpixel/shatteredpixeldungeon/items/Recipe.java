@@ -216,7 +216,8 @@ public abstract class Recipe {
 	private static Recipe[] threeIngredientRecipes = new Recipe[]{
 		new Potion.SeedToPotion(),
 		new StewedMeat.threeMeat(),
-		new MeatPie.Recipe()
+		new MeatPie.Recipe(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic.Brew() //EFPD: permanent tonics
 	};
 	
 	public static ArrayList<Recipe> findRecipes(ArrayList<Item> ingredients){

@@ -133,6 +133,9 @@ public class Injuries extends Buff {
 			return;
 		}
 
+		//open world resilience can shrug off an injury
+		if (Random.Float() < PermStats.injuryAvoidChance()) return;
+
 		Part part = InjuryTable.partFor( enemy );
 		Injuries injuries = Buff.affect( hero, Injuries.class );
 		int before = injuries.severity(part);

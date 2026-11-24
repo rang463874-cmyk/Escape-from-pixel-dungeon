@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.efpd.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -61,6 +62,7 @@ public abstract class MedicalItem extends Item {
 
 			detach( hero.belongings.backpack );
 			treat( hero );
+			PermStats.onTreated();
 			GLog.p( Messages.get(this, "used") );
 
 			hero.sprite.operate( hero.pos );

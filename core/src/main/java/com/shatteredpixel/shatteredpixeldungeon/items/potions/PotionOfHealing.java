@@ -57,8 +57,10 @@ public class PotionOfHealing extends Potion {
 		heal( hero );
 		//EFPD: a potion of healing also treats every injury and stops wound bleeding
 		Injuries injuries = hero.buff( Injuries.class );
+		boolean treated = injuries != null || hero.buff( Hemorrhage.class ) != null;
 		if (injuries != null) injuries.healAll();
 		Buff.detach( hero, Hemorrhage.class );
+		if (treated) com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.onTreated();
 	}
 
 	public static void heal( Char ch ){

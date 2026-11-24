@@ -117,6 +117,7 @@ public class Statistics {
 		efpdDeaths = 0;
 		efpdSurvived = false;
 		efpdSurvivedTurn = 0;
+		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.reset();
 		totalBossScore  = 0;
 		questScores     = new int[5];
 		totalQuestScore = 0;
@@ -227,6 +228,7 @@ public class Statistics {
 		bundle.put( EFPD_DEATHS, efpdDeaths );
 		bundle.put( EFPD_SURVIVED, efpdSurvived );
 		bundle.put( EFPD_SURV_TURN, efpdSurvivedTurn );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.storeInBundle( bundle );
 		bundle.put( TOT_BOSS,    totalBossScore );
 		bundle.put( QUEST_SCORES,questScores );
 		bundle.put( TOT_QUEST,   totalQuestScore );
@@ -290,6 +292,7 @@ public class Statistics {
 		efpdDeaths = bundle.getInt( EFPD_DEATHS );
 		efpdSurvived = bundle.getBoolean( EFPD_SURVIVED );
 		efpdSurvivedTurn = bundle.getInt( EFPD_SURV_TURN );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.restoreFromBundle( bundle );
 		totalBossScore  = bundle.getInt( TOT_BOSS );
 		if (bundle.contains( QUEST_SCORES ))questScores = bundle.getIntArray( QUEST_SCORES );
 		else                                questScores = new int[5];

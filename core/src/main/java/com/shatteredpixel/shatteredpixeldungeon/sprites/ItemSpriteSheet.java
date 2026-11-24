@@ -859,6 +859,25 @@ public class ItemSpriteSheet {
 		assignItemRect(BULLET, 4, 2);
 	}
 
+	//EFPD: open world regional essences and permanent tonics
+	private static final int EFPD_ESSENCE =                                 xy(1, 35);  //5 slots
+	public static final int ESSENCE_SEWERS = EFPD_ESSENCE+0;
+	public static final int ESSENCE_PRISON = EFPD_ESSENCE+1;
+	public static final int ESSENCE_CAVES  = EFPD_ESSENCE+2;
+	public static final int ESSENCE_CITY   = EFPD_ESSENCE+3;
+	public static final int ESSENCE_HALLS  = EFPD_ESSENCE+4;
+	private static final int EFPD_TONIC =                                   xy(7, 35);  //6 slots
+	public static final int TONIC_STRENGTH  = EFPD_TONIC+0;
+	public static final int TONIC_VITALITY  = EFPD_TONIC+1;
+	public static final int TONIC_AGILITY   = EFPD_TONIC+2;
+	public static final int TONIC_SKILL     = EFPD_TONIC+3;
+	public static final int TONIC_ENDURANCE = EFPD_TONIC+4;
+	public static final int TONIC_RESILIENCE= EFPD_TONIC+5;
+	static{
+		for (int i = ESSENCE_SEWERS; i <= ESSENCE_HALLS; i++) assignItemRect(i, 9, 11);
+		for (int i = TONIC_STRENGTH; i <= TONIC_RESILIENCE; i++) assignItemRect(i, 10, 12);
+	}
+
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots
 	public static final int GUIDE_PAGE  = DOCUMENTS+0;
 	public static final int ALCH_PAGE   = DOCUMENTS+1;

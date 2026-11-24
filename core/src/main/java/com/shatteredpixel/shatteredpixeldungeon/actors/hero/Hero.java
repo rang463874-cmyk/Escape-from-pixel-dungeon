@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Injuries;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Encumbrance;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -267,6 +268,8 @@ public class Hero extends Char {
 		HT = 20 + 5*(lvl-1) + HTBoost;
 		float multiplier = RingOfMight.HTMultiplier(this);
 		HT = Math.round(multiplier * HT);
+		//EFPD: open world vitality
+		HT += PermStats.htBonus();
 		
 		if (buff(ElixirOfMight.HTBoost.class) != null){
 			HT += buff(ElixirOfMight.HTBoost.class).boost();
@@ -282,6 +285,8 @@ public class Hero extends Char {
 		int strBonus = 0;
 
 		strBonus += RingOfMight.strengthBonus( this );
+		//EFPD: open world strength
+		strBonus += PermStats.strBonus();
 		
 		AdrenalineSurge buff = buff(AdrenalineSurge.class);
 		if (buff != null){
@@ -570,6 +575,8 @@ public class Hero extends Char {
 		
 		//EFPD: head and arm injuries reduce accuracy
 		accuracy *= Injuries.accuracyMultiplier(this);
+		//EFPD: open world skill
+		accuracy *= PermStats.accuracyMultiplier();
 
 		if (!RingOfForce.fightingUnarmed(this)) {
 			return Math.max(1, Math.round(attackSkill * accuracy * wep.accuracyFactor( this, target )));
@@ -616,6 +623,8 @@ public class Hero extends Char {
 		evasion *= Weight.evasionMultiplier(this);
 		//EFPD: foot injuries make the hero easier to hit
 		evasion *= Injuries.evasionMultiplier(this);
+		//EFPD: open world agility
+		evasion *= PermStats.evasionMultiplier();
 
 		if (belongings.armor() != null) {
 			evasion = belongings.armor().evasionFactor(this, evasion);
@@ -1550,6 +1559,9 @@ public class Hero extends Char {
 	public int attackProc( final Char enemy, int damage ) {
 		damage = super.attackProc( enemy, damage );
 
+		//EFPD: landing hits trains skill (and strength for melee)
+		PermStats.onHeroHit( this, enemy );
+
 		KindOfWeapon wep;
 		if (RingOfForce.fightingUnarmed(this) && !RingOfForce.unarmedGetsWeaponEnchantment(this)){
 			wep = null;
@@ -1717,6 +1729,8 @@ public class Hero extends Char {
 
 		//EFPD: enemy hits can injure body parts
 		Injuries.onHeroDamaged(this, effectiveDamage, src);
+		//EFPD: surviving damage trains vitality
+		PermStats.onHeroDamaged(this, effectiveDamage, src);
 
 		if (buff(Challenge.DuelParticipant.class) != null){
 			buff(Challenge.DuelParticipant.class).addDamage(effectiveDamage);
@@ -2368,6 +2382,9 @@ public class Hero extends Char {
 		boolean wasHighGrass = Dungeon.level.map[step] == Terrain.HIGH_GRASS;
 
 		super.move( step, travelling);
+
+		//EFPD: walking trains endurance, walking under a heavy load trains strength
+		if (travelling) PermStats.onHeroStep( this );
 		
 		if (!flying && travelling) {
 			if (Dungeon.level.water[pos]) {

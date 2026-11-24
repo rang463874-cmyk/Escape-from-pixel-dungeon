@@ -582,6 +582,9 @@ public abstract class Char extends Actor {
 			
 		} else if (!Char.hasProp(enemy, Property.OBJECT)) {
 
+			//EFPD: dodging enemy attacks trains agility
+			if (enemy == Dungeon.hero) com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.onHeroDodge( Dungeon.hero, this );
+
 			if (enemy.sprite != null){
 				if (hitMissIcon != -1){
 					//dooking is a playful sound Ferrets can make, like low pitched chirping

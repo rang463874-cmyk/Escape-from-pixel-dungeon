@@ -22,6 +22,10 @@
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Weight;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.PermStatsTab;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
@@ -61,6 +65,7 @@ public class WndHero extends WndTabbed {
 	private StatsTab stats;
 	private TalentsTab talents;
 	private BuffsTab buffs;
+	private PermStatsTab perm; //EFPD
 
 	public static int lastIdx = 0;
 
@@ -81,6 +86,14 @@ public class WndHero extends WndTabbed {
 		add( buffs );
 		buffs.setRect(0, 0, WIDTH, HEIGHT);
 		buffs.setupList();
+
+		//EFPD: open world permanent stats tab
+		if (OpenWorld.isActive()){
+			perm = new PermStatsTab();
+			add( perm );
+			perm.setRect(0, 0, WIDTH, HEIGHT);
+			perm.refresh();
+		}
 		
 		add( new IconTab( Icons.get(Icons.RANKINGS) ) {
 			protected void select( boolean value ) {
@@ -109,6 +122,20 @@ public class WndHero extends WndTabbed {
 				buffs.visible = buffs.active = selected;
 			}
 		} );
+		if (perm != null){
+			add( new IconTab( new ItemSprite(ItemSpriteSheet.TONIC_STRENGTH) ) {
+				protected void select( boolean value ) {
+					super.select( value );
+					if (selected) {
+						lastIdx = 3;
+						perm.refresh();
+					}
+					perm.visible = perm.active = selected;
+				}
+			} );
+		} else if (lastIdx == 3){
+			lastIdx = 0;
+		}
 
 		layoutTabs();
 
