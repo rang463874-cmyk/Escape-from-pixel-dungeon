@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.RecallCharm;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -53,11 +54,11 @@ public class WndHideoutShop extends WndOptions {
 	//stock and prices, edit here to change what the hideout sells
 	private static final Class<?>[] STOCK    = { Bandage.class, Splint.class, FirstAidKit.class, Food.class, PotionOfHealing.class,
 	                                             LightAmmo.class, RifleAmmo.class, ShotgunShell.class,
-	                                             Canteen.class, RecallCharm.class };
-	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50,   60, 150 };
-	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6,    1,  1   };
+	                                             Canteen.class, RecallCharm.class, SupplyPack.class };
+	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50,   60, 150, 120 };
+	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6,    1,  1,   1   };
 	//only sold in open world mode
-	private static final boolean[]  OPEN_WORLD_ONLY = { false, false, false, false, false, false, false, false, true, true };
+	private static final boolean[]  OPEN_WORLD_ONLY = { false, false, false, false, false, false, false, false, true, true, true };
 
 	//stock indices on display; set before the window is built, since WndOptions asks for its
 	//buttons from its own constructor

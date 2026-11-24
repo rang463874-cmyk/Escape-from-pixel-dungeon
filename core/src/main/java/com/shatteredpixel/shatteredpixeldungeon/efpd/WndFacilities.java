@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.Facility;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.ChargrilledMeat;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Food;
@@ -113,6 +114,9 @@ public class WndFacilities {
 					: msg( "entry_unbuilt", Facilities.name(f) );
 			b.add( label, true, new Runnable() { public void run() { showFacility( f ); } } );
 		}
+		final SupplyPack pack = Dungeon.hero.belongings.getItem( SupplyPack.class );
+		b.add( pack != null ? msg( "pack_entry", pack.packLevel(), SupplyPack.MAX_LEVEL ) : msg( "pack_none" ),
+				pack != null, new Runnable() { public void run() { showPack( pack ); } } );
 		b.add( msg( "back" ), true, new Runnable() { public void run() { GameScene.show( new WndBase() ); } } );
 		b.show( msg( "title" ), msg( "intro" ) + "\n\n" + Facilities.haveText() );
 	}
@@ -171,6 +175,33 @@ public class WndFacilities {
 
 		b.add( msg( "back" ), true, new Runnable() { public void run() { show(); } } );
 		b.show( Facilities.name( f ), text.toString() );
+	}
+
+	//--- supply pack -------------------------------------------------------------------------------
+
+	public static void showPack( final SupplyPack pack ){
+		Builder b = new Builder();
+		StringBuilder text = new StringBuilder( msg( "pack_desc" ) );
+		text.append( "\n\n" ).append( msg( "pack_level", pack.packLevel(), SupplyPack.MAX_LEVEL,
+				pack.capacity(), Math.round( pack.weightBonus() ) ) );
+		final int[] cost = pack.nextCost();
+		if (cost != null){
+			int next = pack.packLevel();
+			text.append( "\n\n" ).append( msg( "pack_next", SupplyPack.SLOTS[next], Math.round( SupplyPack.WEIGHT_BONUS[next] ) ) );
+			text.append( "\n" ).append( msg( "upgrade_cost", Facilities.costText( cost ) ) );
+			text.append( "\n" ).append( msg( "have", Facilities.haveText() ) );
+			b.add( msg( "upgrade" ), Facilities.canAfford( cost ), new Runnable() { public void run() {
+				if (Facilities.upgradePack( pack )){
+					Sample.INSTANCE.play( Assets.Sounds.EVOKE );
+					GLog.p( msg( "pack_upgraded", pack.packLevel() ) );
+				}
+				showPack( pack );
+			}});
+		} else {
+			text.append( "\n\n" ).append( msg( "pack_maxed" ) );
+		}
+		b.add( msg( "back" ), true, new Runnable() { public void run() { show(); } } );
+		b.show( Messages.titleCase( pack.name() ), text.toString() );
 	}
 
 	//--- kitchen ---------------------------------------------------------------------------------

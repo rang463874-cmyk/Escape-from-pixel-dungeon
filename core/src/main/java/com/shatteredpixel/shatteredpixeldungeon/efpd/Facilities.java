@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Material;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Blandfruit;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -308,6 +309,21 @@ public class Facilities {
 		if (!crop.collect()) Dungeon.level.drop( crop, Dungeon.hero.pos ).sprite.drop();
 		saveRun();
 		return crop;
+	}
+
+	//--- supply pack -------------------------------------------------------------------------------
+
+	public static boolean upgradePack( SupplyPack pack ){
+		int[] cost = pack.nextCost();
+		if (!canAfford( cost )) return false;
+		spendGold( cost[0] );
+		for (int m = 0; m < MATERIALS.length; m++){
+			spendMaterial( m, cost[m+1] );
+		}
+		pack.upgradePack();
+		Item.updateQuickslot();
+		saveRun();
+		return true;
 	}
 
 	//--- forge -------------------------------------------------------------------------------------

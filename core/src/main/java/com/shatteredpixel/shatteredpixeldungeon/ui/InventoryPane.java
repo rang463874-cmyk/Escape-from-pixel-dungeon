@@ -188,7 +188,8 @@ public class InventoryPane extends Component {
 		}
 
 		bags = new ArrayList<>();
-		for (int i = 0; i < 5; i++){
+		//EFPD: 6 bag buttons, the open world supply pack can be a fifth bag
+		for (int i = 0; i < 6; i++){
 			BagButton btn = new BagButton(null, i+1);
 			bags.add(btn);
 			add(btn);
@@ -248,8 +249,15 @@ public class InventoryPane extends Component {
 		weightTxt.y = y+5.5f;
 		PixelScene.align(weightTxt);
 
+		//EFPD: squeeze the bag buttons when there are more than 5 bags
+		int bagCount = 0;
+		for (BagButton b : bags) if (b.bag != null) bagCount++;
+		float bagW = SLOT_WIDTH;
+		if (bagCount > 5){
+			bagW = (float)Math.floor( (x + width - 4 - left - (bagCount - 1)) / bagCount );
+		}
 		for (BagButton b : bags){
-			b.setRect(left, y + 14, SLOT_WIDTH, 14);
+			b.setRect(left, y + 14, bagW, 14);
 			left = b.right()+1;
 		}
 
@@ -499,6 +507,9 @@ public class InventoryPane extends Component {
 			return Icons.get( Icons.WAND_HOLSTER );
 		} else if (bag instanceof PotionBandolier) {
 			return Icons.get( Icons.POTION_BANDOLIER );
+		} else if (bag instanceof com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack) {
+			//EFPD
+			return com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack.tabIcon();
 		} else {
 			return Icons.get( Icons.BACKPACK );
 		}

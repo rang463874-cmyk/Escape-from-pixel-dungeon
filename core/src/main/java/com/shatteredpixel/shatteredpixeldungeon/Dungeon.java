@@ -295,6 +295,8 @@ public class Dungeon {
 		GamesInProgress.selectedClass.initHero( hero );
 		//EFPD: open world heroes start with a full canteen
 		if (OpenWorld.isActive()) new com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen().fill().collect( hero.belongings.backpack );
+		//EFPD: and a supply pack for materials and ammo
+		if (OpenWorld.isActive()) new com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack().collect( hero.belongings.backpack );
 		//EFPD: the starting kit can't be extracted into the stash
 		Stash.markStartingKit( hero );
 	}

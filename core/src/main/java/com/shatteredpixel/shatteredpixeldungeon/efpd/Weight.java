@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.efpd.items.RecallCharm;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Honeypot;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -145,7 +146,7 @@ public class Weight {
 	}
 
 	public static float capacity( Hero hero ){
-		return CAPACITY_BASE + CAPACITY_PER_STR * hero.STR();
+		return CAPACITY_BASE + CAPACITY_PER_STR * hero.STR() + SupplyPack.bonusFor( hero );
 	}
 
 	public static int level( Hero hero ){

@@ -416,6 +416,9 @@ public class WndBag extends WndTabbed {
 			return Icons.get( Icons.WAND_HOLSTER );
 		} else if (bag instanceof PotionBandolier) {
 			return Icons.get( Icons.POTION_BANDOLIER );
+		} else if (bag instanceof com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack) {
+			//EFPD
+			return com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack.tabIcon();
 		} else {
 			return Icons.get( Icons.BACKPACK );
 		}
