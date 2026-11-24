@@ -86,6 +86,15 @@ public class Urban {
 		return (branch - 100) % 10 - 1;
 	}
 
+	//the ruined city, in either game mode
+	public static boolean inCity( int branch ){
+		return branch == URBAN_BRANCH || isFloorBranch( branch );
+	}
+
+	public static boolean inCity(){
+		return inCity( Dungeon.branch );
+	}
+
 	public static boolean outdoors(){
 		return isActive() && Dungeon.branch == URBAN_BRANCH;
 	}

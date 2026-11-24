@@ -45,14 +45,15 @@ public class WndWorldMap extends WndOptions {
 
 	private static String[] labels(){
 		int n = OpenWorld.REGION_START.length;
-		String[] labels = new String[n + 1];
+		String[] labels = new String[n + 2];
 		for (int r = 0; r < n; r++){
 			String name = Messages.get(OpenWorld.class, "region_" + r);
 			labels[r] = OpenWorld.regionUnlocked(r)
 					? Messages.get(WndWorldMap.class, "region", name, OpenWorld.REGION_START[r], OpenWorld.REGION_START[r] + 4)
 					: Messages.get(WndWorldMap.class, "locked", name);
 		}
-		labels[n] = Messages.get(WndWorldMap.class, "stay");
+		labels[n] = Messages.get(WndWorldMap.class, "city");
+		labels[n+1] = Messages.get(WndWorldMap.class, "stay");
 		return labels;
 	}
 
@@ -78,7 +79,36 @@ public class WndWorldMap extends WndOptions {
 	protected void onSelect( int index ) {
 		if (index < OpenWorld.REGION_START.length && OpenWorld.regionUnlocked( index )){
 			OpenWorld.travelTo( OpenWorld.REGION_START[index], 0 );
+		} else if (index == OpenWorld.REGION_START.length){
+			showCity();
 		}
+	}
+
+	/** The ruined city's districts: each opens together with the dungeon region of its rank. */
+	private static void showCity(){
+		final int n = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS.length;
+		String[] labels = new String[n + 1];
+		for (int z = 0; z < n; z++){
+			labels[z] = OpenWorld.regionUnlocked( z )
+					? Messages.get(WndWorldMap.class, "city_district", z + 1)
+					: Messages.get(WndWorldMap.class, "locked", Messages.get(WndWorldMap.class, "city_district", z + 1));
+		}
+		labels[n] = Messages.get(WndWorldMap.class, "stay");
+		GameScene.show( new WndOptions( Icons.get(Icons.STAIRS), Messages.get(WndWorldMap.class, "city_title"),
+				Messages.get(WndWorldMap.class, "city_desc"), labels ){
+			@Override
+			protected boolean enabled( int index ) {
+				return index >= n || OpenWorld.regionUnlocked( index );
+			}
+			@Override
+			protected void onSelect( int index ) {
+				if (index < n && OpenWorld.regionUnlocked( index )){
+					com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.arrivalFrom = -1;
+					OpenWorld.travelTo( com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS[index],
+							com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH );
+				}
+			}
+		});
 	}
 
 }

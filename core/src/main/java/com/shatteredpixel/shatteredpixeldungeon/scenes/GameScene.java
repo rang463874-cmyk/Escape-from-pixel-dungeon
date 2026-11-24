@@ -630,7 +630,7 @@ public class GameScene extends PixelScene {
 		if (InterlevelScene.mode != InterlevelScene.Mode.NONE) {
 			if (Dungeon.depth == Statistics.deepestFloor
 					&& (InterlevelScene.mode == InterlevelScene.Mode.DESCEND || InterlevelScene.mode == InterlevelScene.Mode.FALL)) {
-				if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
+				if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
 				Sample.INSTANCE.play(Assets.Sounds.DESCEND);
 
 				//EFPD: remind the player about the stash at the start of a raid
@@ -667,7 +667,7 @@ public class GameScene extends PixelScene {
 				GLog.h(Messages.get(this, "warp"));
 			} else if (InterlevelScene.mode == InterlevelScene.Mode.RESURRECT) {
 				GLog.h(Messages.get(this, "resurrect"), Dungeon.depth);
-			} else if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()) {
+			} else if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()) {
 				GLog.h(Messages.get(this, "return"), Dungeon.depth);
 			}
 
@@ -756,8 +756,10 @@ public class GameScene extends PixelScene {
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.populateBase();
 			}
 			//EFPD: urban warfare arrival messages
-			if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.outdoors()){
-				if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw()){
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity() && Dungeon.branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH){
+				if (OpenWorld.isActive() && InterlevelScene.mode == InterlevelScene.Mode.RETURN){
+					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "ow_arrive", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));
+				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive() && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw()){
 					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "start"));
 				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.consumeZoneArrival()){
 					GLog.w(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "new_zone", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));

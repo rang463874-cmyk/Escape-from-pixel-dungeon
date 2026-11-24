@@ -130,6 +130,14 @@ public class BuildingLevel extends Level {
 		return true;
 	}
 
+	@Override
+	public LevelTransition getTransition( LevelTransition.Type type ) {
+		LevelTransition t = super.getTransition( type );
+		if (t == null && type != null) t = super.getTransition( (LevelTransition.Type) null );
+		if (t == null && !transitions.isEmpty()) t = transitions.get( 0 );
+		return t;
+	}
+
 	private int farFrom( int from, int w, int h, int tile ){
 		int best = -1;
 		for (int tries = 0; tries < 20; tries++){
@@ -172,7 +180,7 @@ public class BuildingLevel extends Level {
 	@Override
 	protected void createItems() {
 		for (int cell : lootCells){
-			Item item = Generator.random();
+			Item item = CityLoot.floorItem();
 			if (item != null) drop( item, cell );
 		}
 		if (floor < 0){
@@ -181,7 +189,7 @@ public class BuildingLevel extends Level {
 		}
 		//the top floor keeps a locked-away stash
 		if (chestCell != -1){
-			Item prize = Random.Int(10) < 3 ? UrbanMobs.randomGun() : Generator.random();
+			Item prize = CityLoot.rare();
 			Heap heap = drop( prize, chestCell );
 			heap.type = Heap.Type.CHEST;
 			Item second = Generator.random();

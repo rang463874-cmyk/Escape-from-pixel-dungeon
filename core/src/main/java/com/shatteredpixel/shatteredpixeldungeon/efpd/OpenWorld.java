@@ -224,6 +224,10 @@ public class OpenWorld {
 
 	public static String corpseLocation(){
 		if (Statistics.efpdCorpseDepth < 0) return null;
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity( Statistics.efpdCorpseBranch )){
+			return Messages.get(WndWorldMap.class, "city_district",
+					com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( Statistics.efpdCorpseDepth ) + 1);
+		}
 		return Messages.get(OpenWorld.class, "region_" + regionOf(Statistics.efpdCorpseDepth))
 				+ " " + Messages.get(OpenWorld.class, "floor", Statistics.efpdCorpseDepth);
 	}

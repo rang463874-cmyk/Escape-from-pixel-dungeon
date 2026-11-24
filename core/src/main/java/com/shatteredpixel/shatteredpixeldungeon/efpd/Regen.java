@@ -42,9 +42,16 @@ public class Regen {
 	private static long[] lastVisit  = new long[SIZE];
 	private static int[]  generation = new int[SIZE];
 
+	//open world visits to the ruined city: one entry per district, building floors included
+	public static final int CITY_REGEN_TURNS = 3 * DayNight.DAY_LENGTH;
+	private static long[] cityVisit = new long[8];
+	private static int[]  cityGen   = new int[8];
+
 	public static void reset(){
 		lastVisit  = new long[SIZE];
 		generation = new int[SIZE];
+		cityVisit  = new long[8];
+		cityGen    = new int[8];
 	}
 
 	private static boolean eligible( int depth, int branch ){
@@ -65,7 +72,31 @@ public class Regen {
 	public static void markVisit(){
 		if (Dungeon.branch == 0 && Dungeon.depth >= 0 && Dungeon.depth < SIZE){
 			lastVisit[Dungeon.depth] = DayNight.turn();
+		} else if (OpenWorld.isActive() && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity( Dungeon.branch )){
+			cityVisit[com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( Dungeon.depth )] = DayNight.turn();
 		}
+	}
+
+	public static int cityTurnsUntilRegen( int depth ){
+		return (int)Math.max( 0, cityVisit[com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( depth )] + CITY_REGEN_TURNS - DayNight.turn() );
+	}
+
+	private static boolean cityHeldByCorpse( int depth ){
+		return Statistics.efpdCorpseDepth == depth && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity( Statistics.efpdCorpseBranch );
+	}
+
+	//a whole district regrows at once: its street map and every building floor
+	private static boolean shouldRegenerateCity( int depth ){
+		int z = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( depth );
+		if (cityVisit[z] <= 0 || cityTurnsUntilRegen( depth ) > 0 || cityHeldByCorpse( depth )) return false;
+		cityGen[z]++;
+		cityVisit[z] = 0;
+		for (Integer key : Dungeon.generatedLevels.toArray( new Integer[0] )){
+			int b = key / 1000, d = key % 1000;
+			if (d == depth && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isFloorBranch( b )) Dungeon.generatedLevels.remove( key );
+		}
+		notice = true;
+		return true;
 	}
 
 	public static int turnsUntilRegen( int depth ){
@@ -78,6 +109,7 @@ public class Regen {
 	 * built anew instead, and bumps its generation so it gets a fresh seed.
 	 */
 	public static boolean shouldRegenerate( int depth, int branch ){
+		if (OpenWorld.isActive() && branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH) return shouldRegenerateCity( depth );
 		if (!eligible( depth, branch ) || lastVisit[depth] <= 0) return false;
 		if (turnsUntilRegen( depth ) > 0) return false;
 		generation[depth]++;
@@ -96,6 +128,10 @@ public class Regen {
 
 	/** Mixes the floor's generation into its level seed, so a regenerated floor looks different. */
 	public static long seedFor( int depth, int branch, long seed ){
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity( branch )){
+			int g = cityGen[com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( depth )];
+			return g == 0 ? seed : seed ^ (0x7F4A7C159E3779B9L * g);
+		}
 		if (branch != 0 || depth < 0 || depth >= SIZE || generation[depth] == 0) return seed;
 		return seed ^ (0x9E3779B97F4A7C15L * generation[depth]);
 	}
@@ -108,6 +144,8 @@ public class Regen {
 		Bundle node = new Bundle();
 		node.put( VISIT, lastVisit );
 		node.put( GEN, generation );
+		node.put( "city_visit", cityVisit );
+		node.put( "city_gen", cityGen );
 		bundle.put( NODE, node );
 	}
 
@@ -117,6 +155,10 @@ public class Regen {
 		Bundle node = bundle.getBundle( NODE );
 		long[] v = node.getLongArray( VISIT );
 		if (v != null) System.arraycopy( v, 0, lastVisit, 0, Math.min(v.length, SIZE) );
+		long[] cv = node.getLongArray( "city_visit" );
+		if (cv != null) System.arraycopy( cv, 0, cityVisit, 0, Math.min(cv.length, cityVisit.length) );
+		int[] cg = node.getIntArray( "city_gen" );
+		if (cg != null) System.arraycopy( cg, 0, cityGen, 0, Math.min(cg.length, cityGen.length) );
 		int[] g = node.getIntArray( GEN );
 		if (g != null) System.arraycopy( g, 0, generation, 0, Math.min(g.length, SIZE) );
 	}

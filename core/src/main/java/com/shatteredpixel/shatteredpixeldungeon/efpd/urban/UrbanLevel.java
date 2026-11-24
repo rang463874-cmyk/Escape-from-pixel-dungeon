@@ -174,10 +174,14 @@ public class UrbanLevel extends Level {
 		if (zone() > 0){
 			//the subway exit the hero came up from, leading back to the previous district
 			map[startCell] = Terrain.EXIT;
+			//only when the way back is known (reached by subway, or the previous district exists)
 			int prev = Urban.prevZoneDepth( Dungeon.depth );
-			int back = Urban.arrivalFrom >= 100 ? Urban.arrivalFrom : Urban.floorBranch( findSubway( prev ), -1 );
-			transitions.add( new LevelTransition( this, startCell, LevelTransition.Type.BRANCH_ENTRANCE,
-					prev, back, LevelTransition.Type.BRANCH_EXIT ) );
+			int sub = findSubway( prev );
+			int back = Urban.arrivalFrom >= 100 ? Urban.arrivalFrom : (sub >= 0 ? Urban.floorBranch( sub, -1 ) : -1);
+			if (back >= 0){
+				transitions.add( new LevelTransition( this, startCell, LevelTransition.Type.BRANCH_ENTRANCE,
+						prev, back, LevelTransition.Type.BRANCH_EXIT ) );
+			}
 		}
 
 		//gates in the city wall: 3 of the 4 sides, each at the end of a road
@@ -246,7 +250,7 @@ public class UrbanLevel extends Level {
 	private int findSubway( int depth ){
 		for (int b = 0; ; b++){
 			int[] s = Urban.spec( depth, b );
-			if (s == null) return 0;
+			if (s == null) return -1;
 			if (s[Urban.SPEC_SUBWAY] == 1) return b;
 		}
 	}
@@ -416,14 +420,20 @@ public class UrbanLevel extends Level {
 			}
 			return new LevelTransition( this, startCell, LevelTransition.Type.REGULAR_ENTRANCE );
 		}
-		return super.getTransition( type );
+		LevelTransition t = super.getTransition( type );
+		//stairs that no longer match (a district regrew): stand on the plaza instead
+		return t != null ? t : new LevelTransition( this, startCell, LevelTransition.Type.REGULAR_ENTRANCE );
 	}
 
 	@Override
 	public boolean activateTransition( Hero hero, LevelTransition transition ) {
 		if (locked) return false;
 		if (transition.type == LevelTransition.Type.SURFACE){
-			UrbanEscape.showGateWindow( hero );
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.isActive()){
+				UrbanEscape.showTownWindow();
+			} else {
+				UrbanEscape.showGateWindow( hero );
+			}
 			return false;
 		}
 		Urban.arrivalFrom = Dungeon.branch;

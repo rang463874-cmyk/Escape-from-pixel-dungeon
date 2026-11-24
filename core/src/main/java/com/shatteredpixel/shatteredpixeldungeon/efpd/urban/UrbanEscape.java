@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.efpd.urban;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Extraction;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
@@ -32,6 +33,25 @@ import com.watabou.utils.Callback;
 
 /** The city gates: walking through one ends the run as a successful extraction. */
 public class UrbanEscape {
+
+	/** Open world: the city gates lead back to the base town. */
+	public static void showTownWindow(){
+		Game.runOnRenderThread(new Callback() {
+			@Override
+			public void call() {
+				GameScene.show( new WndOptions( Icons.get(Icons.STAIRS),
+						Messages.get(UrbanEscape.class, "title"),
+						Messages.get(UrbanEscape.class, "desc_town"),
+						Messages.get(UrbanEscape.class, "go_town"),
+						Messages.get(UrbanEscape.class, "stay") ){
+					@Override
+					protected void onSelect( int index ) {
+						if (index == 0) OpenWorld.travelToBase();
+					}
+				});
+			}
+		});
+	}
 
 	public static void showGateWindow( final Hero hero ){
 		Game.runOnRenderThread(new Callback() {
