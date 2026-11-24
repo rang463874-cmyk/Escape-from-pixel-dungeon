@@ -162,9 +162,8 @@ public abstract class Gun extends MeleeWeapon {
 		if (action.equals( AC_SHOOT )) {
 			if (!isEquipped( hero )){
 				GLog.w( Messages.get(Gun.class, "not_equipped") );
-			} else if (loaded <= 0){
-				GLog.w( Messages.get(Gun.class, "empty") );
 			} else {
+				//aiming works with an empty magazine too: tapping yourself reloads
 				curUser = hero;
 				curItem = this;
 				GameScene.selectCell( shooter );
@@ -224,7 +223,13 @@ public abstract class Gun extends MeleeWeapon {
 	private final CellSelector.Listener shooter = new CellSelector.Listener() {
 		@Override
 		public void onSelect( Integer target ) {
-			if (target != null && loaded > 0) {
+			if (target == null) return;
+			//tapping yourself while aiming reloads
+			if (target == curUser.pos) {
+				reload( curUser );
+			} else if (loaded <= 0) {
+				GLog.w( Messages.get(Gun.class, "empty") );
+			} else {
 				new Bullet().cast( curUser, target );
 			}
 		}

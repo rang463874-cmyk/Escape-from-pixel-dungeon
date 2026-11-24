@@ -1558,6 +1558,8 @@ public class Hero extends Char {
 			}
 		}
 		resting = fullRest;
+		//EFPD: resting in place can slowly mend injuries
+		Injuries.onRest( this );
 	}
 	
 	@Override

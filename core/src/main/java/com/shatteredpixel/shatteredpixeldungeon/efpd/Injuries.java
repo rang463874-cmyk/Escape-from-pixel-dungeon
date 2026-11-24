@@ -116,7 +116,40 @@ public class Injuries extends Buff {
 		detach();
 	}
 
+	//chance per turn of resting in place to mend one step of an injury (severe -> minor -> healed)
+	public static final float[] REST_HEAL_CHANCE = { 0f, 1/150f, 1/300f };
+
 	//--- hooks called from the original game code ------------------------------------------------
+
+	/** Resting in place (wait or long rest) with no enemy in sight can slowly mend injuries. */
+	public static void onRest( Hero hero ){
+		Injuries inj = hero.buff( Injuries.class );
+		if (inj == null || hero.visibleEnemies() > 0) return;
+		//a bleeding wound has to be dressed before it can mend
+		if (hero.buff( Hemorrhage.class ) != null) return;
+
+		//mend the least serious injury first
+		Part target = null;
+		for (Part p : Part.values()){
+			int s = inj.severity( p );
+			if (s > NONE && (target == null || s < inj.severity( target ))) target = p;
+		}
+		if (target == null) return;
+
+		int sev = inj.severity( target );
+		if (Random.Float() >= REST_HEAL_CHANCE[sev] * PermStats.regenMultiplier()) return;
+
+		String partName = Messages.get(Injuries.class, "part_" + target.name().toLowerCase());
+		if (sev == SEVERE){
+			inj.severity[target.ordinal()] = MINOR;
+			BuffIndicator.refreshHero();
+			GLog.p( Messages.get(Injuries.class, "rest_better", partName) );
+		} else {
+			inj.heal( target );
+			GLog.p( Messages.get(Injuries.class, "rest_healed", partName) );
+		}
+		hero.interrupt();
+	}
 
 	public static void onHeroDamaged( Hero hero, int damage, Object src ){
 		if (!hero.isAlive() || !(src instanceof Mob)) return;

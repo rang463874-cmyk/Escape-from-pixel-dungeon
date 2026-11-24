@@ -229,6 +229,16 @@ public class WndDevTools extends Window {
 				GLog.p( Messages.get(WndDevTools.class, "healed") );
 			}
 		});
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.SPLINT), Messages.get(this, "injure") ){
+			@Override protected void give() {
+				//one minor and one severe injury on random body parts
+				Injuries inj = com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.affect( Dungeon.hero, Injuries.class );
+				Injuries.Part[] parts = Injuries.Part.values();
+				inj.injure( parts[com.watabou.utils.Random.Int(parts.length)], Injuries.MINOR );
+				inj.injure( parts[com.watabou.utils.Random.Int(parts.length)], Injuries.SEVERE );
+				GLog.w( Messages.get(WndDevTools.class, "injured") );
+			}
+		});
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.TOMB), Messages.get(this, "die") ){
 			@Override protected void give() {
 				hide();
