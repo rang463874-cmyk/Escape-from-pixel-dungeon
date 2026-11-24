@@ -21,6 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.efpd;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.LightAmmo;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.RifleAmmo;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.ShotgunShell;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
@@ -44,19 +47,24 @@ import com.watabou.utils.Reflection;
 public class WndHideoutShop extends WndOptions {
 
 	//stock and prices, edit here to change what the hideout sells
-	private static final Class<?>[] STOCK  = { Bandage.class, Splint.class, FirstAidKit.class, Food.class, PotionOfHealing.class };
-	private static final int[]      PRICES = { 40,            100,          200,               50,         300 };
+	private static final Class<?>[] STOCK    = { Bandage.class, Splint.class, FirstAidKit.class, Food.class, PotionOfHealing.class,
+	                                             LightAmmo.class, RifleAmmo.class, ShotgunShell.class };
+	private static final int[]      PRICES   = { 40,  100, 200, 50, 300,   40, 60, 50 };
+	private static final int[]      QUANTITY = { 1,   1,   1,   1,  1,     10, 10, 6  };
 
 	private static Item make( int i ){
 		Item item = (Item) Reflection.newInstance( STOCK[i] );
 		item.identify();
+		if (QUANTITY[i] > 1) item.quantity( QUANTITY[i] );
 		return item;
 	}
 
 	private static String[] labels(){
 		String[] labels = new String[STOCK.length + 1];
 		for (int i = 0; i < STOCK.length; i++){
-			labels[i] = Messages.get(WndHideoutShop.class, "entry", Messages.titleCase(make(i).name()), PRICES[i]);
+			String name = Messages.titleCase(make(i).name());
+			if (QUANTITY[i] > 1) name += " x" + QUANTITY[i];
+			labels[i] = Messages.get(WndHideoutShop.class, "entry", name, PRICES[i]);
 		}
 		labels[STOCK.length] = Messages.get(WndHideoutShop.class, "back");
 		return labels;

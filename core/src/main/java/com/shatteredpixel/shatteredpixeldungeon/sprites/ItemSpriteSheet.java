@@ -29,7 +29,7 @@ public class ItemSpriteSheet {
 	public static final int SIZE = 16;
 
 	private static final int TX_WIDTH = 256;
-	private static final int TX_HEIGHT = 512;
+	private static final int TX_HEIGHT = 576; //EFPD: extended by 4 rows for mod items
 
 	private static final int WIDTH = TX_WIDTH / SIZE;
 
@@ -809,6 +809,54 @@ public class ItemSpriteSheet {
 		assignItemRect(BANDAGE,       12, 11);
 		assignItemRect(SPLINT,        14, 14);
 		assignItemRect(FIRST_AID_KIT, 14, 12);
+	}
+
+	//EFPD: guns
+	private static final int EFPD_GUNS =                                    xy(1, 33);  //16 slots
+	public static final int FLINTLOCK_PISTOL = EFPD_GUNS+0;
+	public static final int ZIP_GUN = EFPD_GUNS+1;
+	public static final int POCKET_REVOLVER = EFPD_GUNS+2;
+	public static final int REVOLVER = EFPD_GUNS+3;
+	public static final int DOUBLE_BARREL = EFPD_GUNS+4;
+	public static final int BOLT_CARBINE = EFPD_GUNS+5;
+	public static final int AUTO_PISTOL = EFPD_GUNS+6;
+	public static final int PUMP_SHOTGUN = EFPD_GUNS+7;
+	public static final int LEVER_RIFLE = EFPD_GUNS+8;
+	public static final int SUBMACHINE_GUN = EFPD_GUNS+9;
+	public static final int ASSAULT_RIFLE = EFPD_GUNS+10;
+	public static final int MARKSMAN_RIFLE = EFPD_GUNS+11;
+	public static final int LIGHT_MACHINE_GUN = EFPD_GUNS+12;
+	public static final int ANTI_MATERIEL_RIFLE = EFPD_GUNS+13;
+	public static final int AUTO_SHOTGUN = EFPD_GUNS+14;
+	static{
+		assignItemRect(FLINTLOCK_PISTOL, 12, 7);
+		assignItemRect(ZIP_GUN, 11, 7);
+		assignItemRect(POCKET_REVOLVER, 10, 7);
+		assignItemRect(REVOLVER, 13, 7);
+		assignItemRect(DOUBLE_BARREL, 16, 6);
+		assignItemRect(BOLT_CARBINE, 16, 6);
+		assignItemRect(AUTO_PISTOL, 11, 7);
+		assignItemRect(PUMP_SHOTGUN, 16, 5);
+		assignItemRect(LEVER_RIFLE, 16, 5);
+		assignItemRect(SUBMACHINE_GUN, 14, 7);
+		assignItemRect(ASSAULT_RIFLE, 16, 7);
+		assignItemRect(MARKSMAN_RIFLE, 16, 7);
+		assignItemRect(LIGHT_MACHINE_GUN, 16, 6);
+		assignItemRect(ANTI_MATERIEL_RIFLE, 16, 7);
+		assignItemRect(AUTO_SHOTGUN, 16, 6);
+	}
+
+	//EFPD: ammo
+	private static final int EFPD_AMMO =                                    xy(1, 34);  //16 slots
+	public static final int AMMO_LIGHT = EFPD_AMMO+0;
+	public static final int AMMO_RIFLE = EFPD_AMMO+1;
+	public static final int AMMO_SHELL = EFPD_AMMO+2;
+	public static final int BULLET = EFPD_AMMO+3;
+	static{
+		assignItemRect(AMMO_LIGHT, 9, 5);
+		assignItemRect(AMMO_RIFLE, 11, 6);
+		assignItemRect(AMMO_SHELL, 8, 6);
+		assignItemRect(BULLET, 4, 2);
 	}
 
 	private static final int DOCUMENTS  =                                   xy(1, 32);  //16 slots

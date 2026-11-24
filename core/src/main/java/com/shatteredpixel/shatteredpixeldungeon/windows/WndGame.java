@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.WndDevTools;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
@@ -35,6 +36,8 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RedButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.noosa.Game;
+
+import com.watabou.utils.DeviceCompat;
 
 import java.io.IOException;
 
@@ -95,6 +98,19 @@ public class WndGame extends Window {
 				}
 			} );
 			curBtn.icon(Icons.get(Icons.RANKINGS));
+		}
+
+		//EFPD: developer tools, only in development (INDEV) builds
+		if (DeviceCompat.isDebug() && Dungeon.hero != null && Dungeon.hero.isAlive()) {
+			addButton( curBtn = new RedButton( Messages.get(WndDevTools.class, "button") ) {
+				@Override
+				protected void onClick() {
+					hide();
+					GameScene.show( new WndDevTools() );
+				}
+			} );
+			curBtn.icon(Icons.get(Icons.PREFS));
+			curBtn.textColor(0x44CCFF);
 		}
 
 		// Main menu

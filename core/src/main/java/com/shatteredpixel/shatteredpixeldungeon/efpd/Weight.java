@@ -21,6 +21,8 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.efpd;
 
+import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Ammo;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.Gun;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Bandage;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.FirstAidKit;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.Splint;
@@ -73,6 +75,10 @@ public class Weight {
 	//weight of a single unit of an item
 	public static float unitWeight( Item item ){
 		if (item instanceof Bag)            return 0.5f;
+
+		//guns and ammo
+		if (item instanceof Gun)            return ((Gun) item).weight();
+		if (item instanceof Ammo)           return 0.02f;
 
 		//weapons
 		if (item instanceof Dart)           return 0.1f;
