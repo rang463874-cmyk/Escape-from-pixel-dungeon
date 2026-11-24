@@ -1,10 +1,15 @@
 # Builds the Android APKs and publishes them as a GitHub Release.
-# Trigger: push a tag like v0.4.0, or run it manually from the Actions tab.
+# Triggers:
+#  - pushing a change to docs/release-notes.md (the tag is v + appVersionName from build.gradle)
+#  - pushing a tag like v0.4.0
+#  - running it manually from the Actions tab
 name: Android release
 
 on:
   push:
     tags: [ 'v*' ]
+    branches: [ '**' ]
+    paths: [ 'docs/release-notes.md' ]
   workflow_dispatch:
     inputs:
       tag:
@@ -17,10 +22,22 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ github.event.inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Work out the release tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="v$(grep -oP "appVersionName = '\K[^']+" build.gradle)"
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "Release tag: $TAG"
 
       - uses: actions/setup-java@v4
         with:
@@ -67,7 +84,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$TAG" dist/*.apk --repo "$GITHUB_REPOSITORY" \
+          gh release create "$TAG" dist/*.apk --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Escape from Pixel Dungeon $TAG" --notes-file docs/release-notes.md
 
       # Without access to the Actions logs, a failed build leaves its log tail in a draft release

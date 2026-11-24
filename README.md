@@ -119,7 +119,7 @@
 
 - [Releases](../../releases)에서 최신 `EscapeFromPixelDungeon-<버전>.apk`를 받아 설치합니다(안드로이드 5.0 이상, "출처를 알 수 없는 앱" 허용 필요).
 - `-devtools.apk`는 개발자 도구가 켜진 테스트용이며, 별도 앱으로 설치됩니다.
-- 새 버전 만들기: `build.gradle`의 `appVersionCode`·`appVersionName`과 `docs/release-notes.md`의 `internal version number`를 올린 뒤, `v<버전>` 태그를 푸시하면 GitHub Actions(`.github/workflows/android-release.yml`)가 APK를 빌드해 릴리즈로 올립니다. 게임 안의 업데이트 알림도 이 릴리즈를 봅니다.
+- 새 버전 만들기: `build.gradle`의 `appVersionCode`·`appVersionName`과 `docs/release-notes.md`(맨 아래 `internal version number` 포함)를 고쳐서 푸시하면, GitHub Actions(`.github/workflows/android-release.yml`)가 `v<appVersionName>` 릴리즈를 만들어 APK를 올립니다. Actions 탭에서 수동으로 실행할 수도 있습니다. 게임 안의 업데이트 알림도 이 릴리즈를 봅니다.
 - 서명: 저장소 시크릿 `EFPD_KEYSTORE_B64`(키스토어 base64), `EFPD_KEYSTORE_PASSWORD`, `EFPD_KEY_ALIAS`, `EFPD_KEY_PASSWORD`가 있으면 그 키로 서명합니다. 없으면 저장소에 들어 있는 `android/efpd-debug.keystore`(비밀번호가 공개된 디버그용 키)로 서명합니다. 서명 키를 바꾸면 기존 앱 위에 업데이트할 수 없어 삭제 후 재설치(세이브 삭제)가 필요하니, 개인 키는 정식 배포 전에 정하는 것이 좋습니다.
 
 ## 로드맵
