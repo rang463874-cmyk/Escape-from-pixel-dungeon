@@ -60,6 +60,8 @@ public class RecallCharm extends Item {
 			GLog.w( Messages.get(this, "only_open_world") );
 		} else if (OpenWorld.onBase()){
 			GLog.w( Messages.get(this, "already_home") );
+		} else if (OpenWorld.amuletBlocksShortcut( hero )){
+			//message shown by the check
 		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.inLab()){
 			GLog.w( Messages.get(this, "lab") );
 		} else if (Dungeon.level.locked){

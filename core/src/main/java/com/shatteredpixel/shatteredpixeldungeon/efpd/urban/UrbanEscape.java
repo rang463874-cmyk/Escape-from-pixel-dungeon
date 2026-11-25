@@ -46,7 +46,7 @@ public class UrbanEscape {
 						Messages.get(UrbanEscape.class, "stay") ){
 					@Override
 					protected void onSelect( int index ) {
-						if (index == 0) OpenWorld.travelToBase();
+						if (index == 0 && !OpenWorld.amuletBlocksShortcut( com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero )) OpenWorld.travelToBase();
 					}
 				});
 			}

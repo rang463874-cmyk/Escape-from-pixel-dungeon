@@ -101,6 +101,16 @@ public class OpenWorld {
 		travelTo( BASE_DEPTH, BASE_BRANCH );
 	}
 
+	/**
+	 * While carrying the Amulet of Yendor back up, the shortcuts to town are closed: the hero
+	 * has to climb all the way out. Says so and returns true if that's the case.
+	 */
+	public static boolean amuletBlocksShortcut( Hero hero ){
+		if (hero == null || hero.belongings.getItem( com.shatteredpixel.shatteredpixeldungeon.items.Amulet.class ) == null) return false;
+		GLog.w( Messages.get(OpenWorld.class, "amulet_blocks") );
+		return true;
+	}
+
 	/** Shown at the up stairs of a region's first floor. */
 	public static void showReturnWindow( final Hero hero, final LevelTransition transition ){
 		Game.runOnRenderThread(new Callback() {
@@ -118,7 +128,7 @@ public class OpenWorld {
 					@Override
 					protected void onSelect( int index ) {
 						if (index == 0){
-							travelToBase();
+							if (!amuletBlocksShortcut( hero )) travelToBase();
 						} else if (index == 1 && canGoUp){
 							Dungeon.level.performTransition( hero, transition );
 						}
