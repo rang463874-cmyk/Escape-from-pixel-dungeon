@@ -704,13 +704,24 @@ public class InterlevelScene extends PixelScene {
 		Dungeon.depth = curTransition.destDepth;
 		Dungeon.branch = curTransition.destBranch;
 
+		//EFPD: a floor that was generated before but is being built anew (open world regrowth)
+		boolean known = Dungeon.generatedLevels.contains(Dungeon.depth + 1000*Dungeon.branch);
+		boolean regenerated;
 		if (Dungeon.levelHasBeenGenerated(Dungeon.depth, Dungeon.branch)) {
 			level = Dungeon.loadLevel( GamesInProgress.curSlot );
+			regenerated = false;
 		} else {
 			level = Dungeon.newLevel();
+			regenerated = known;
 		}
 
 		LevelTransition destTransition = level.getTransition(curTransition.destType);
+		//EFPD: coming up into a regrown floor puts the hero at its entrance, not its exit:
+		//a fresh boss floor's exit is sealed off in the dark until the boss is beaten again
+		if (regenerated && Dungeon.branch == 0) {
+			LevelTransition entrance = level.getTransition(LevelTransition.Type.REGULAR_ENTRANCE);
+			if (entrance != null) destTransition = entrance;
+		}
 		curTransition = null;
 		Dungeon.switchLevel( level, destTransition.cell() );
 	}
