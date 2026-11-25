@@ -30,6 +30,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Extraction;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.Regen;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.Stash;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -90,7 +92,7 @@ public class Lab {
 	}
 
 	public static boolean inLab(){
-		return active && Dungeon.branch == LAB_BRANCH && Dungeon.level instanceof LabLevel;
+		return (active || OpenWorld.isActive()) && Dungeon.branch == LAB_BRANCH && Dungeon.level instanceof LabLevel;
 	}
 
 	//--- keycards --------------------------------------------------------------------------------
@@ -120,6 +122,36 @@ public class Lab {
 		return Messages.get( Lab.class, "status", keycardsInStash(), Stash.labClears );
 	}
 
+	//--- open world entry -------------------------------------------------------------------------
+
+	/** Keycards the open world hero could spend: carried ones and the stash's. */
+	public static int keycardsAvailable(){
+		int n = 0;
+		if (Dungeon.hero != null) for (Keycard k : Dungeon.hero.belongings.getAllItems( Keycard.class )) n += k.quantity();
+		Stash.load();
+		return n + keycardsInStash();
+	}
+
+	public static boolean corpseInLab(){
+		return com.shatteredpixel.shatteredpixeldungeon.Statistics.efpdCorpseDepth == LAB_DEPTH
+				&& com.shatteredpixel.shatteredpixeldungeon.Statistics.efpdCorpseBranch == LAB_BRANCH;
+	}
+
+	/** Open world: spends a keycard (carried first) and goes to the Lab, built anew unless the hero's remains are there. */
+	public static boolean enterFromOpenWorld(){
+		boolean paid = false;
+		for (Keycard k : Dungeon.hero.belongings.getAllItems( Keycard.class )){
+			if (k.quantity() > 1) k.quantity( k.quantity() - 1 ); else k.detachAll( Dungeon.hero.belongings.backpack );
+			paid = true;
+			break;
+		}
+		if (!paid) paid = spendKeycard();
+		if (!paid) return false;
+		if (!corpseInLab()) Regen.forceLabRegen();
+		OpenWorld.travelTo( LAB_DEPTH, LAB_BRANCH );
+		return true;
+	}
+
 	//--- environment -----------------------------------------------------------------------------
 
 	public static float hungerMultiplier(){
@@ -135,6 +167,7 @@ public class Lab {
 
 	//shown when the hero arrives
 	public static void onArrive(){
+		showPendingVictory();
 		if (!inLab() || Dungeon.hero == null) return;
 		if (Dungeon.hero.buff( Hazard.class ) == null){
 			//the first leak comes a while after arriving
@@ -144,6 +177,9 @@ public class Lab {
 		if (canWithdraw()){
 			GameScene.show( new WndMessage( Messages.get( Lab.class, "brief_title" ) + "\n\n"
 					+ Messages.get( Lab.class, "brief", GENERATORS ) ) );
+		} else if (OpenWorld.isActive() && l.generatorsOn() == 0 && !l.leverPulled()){
+			GameScene.show( new WndMessage( Messages.get( Lab.class, "brief_title" ) + "\n\n"
+					+ Messages.get( Lab.class, "brief_ow", GENERATORS ) ) );
 		}
 		GLog.w( Messages.get( Lab.class, "arrive", l.generatorsOn(), GENERATORS ) );
 	}
@@ -248,7 +284,19 @@ public class Lab {
 
 	//--- the end ---------------------------------------------------------------------------------
 
+	//open world: the victory message waits until the hero is back in town
+	private static int pendingVictory = 0;
+
 	public static void escape( final Hero hero ){
+		if (OpenWorld.isActive()){
+			//open world: back to town with the loot, the run goes on
+			Stash.load();
+			Stash.labClears++;
+			Stash.save();
+			pendingVictory = Stash.labClears;
+			OpenWorld.travelToBase();
+			return;
+		}
 		Extraction.extract( hero );
 		Stash.labClears++;
 		Stash.save();
@@ -256,10 +304,23 @@ public class Lab {
 		Game.runOnRenderThread( new Callback() {
 			@Override
 			public void call() {
-				GameScene.show( new WndMessage( Messages.get( Lab.class, "victory_title" ) + "\n\n"
-						+ Messages.get( Lab.class, "victory", clears ) ) );
+				showVictory( clears );
 			}
 		} );
+	}
+
+	private static void showVictory( int clears ){
+		GameScene.show( new WndMessage( Messages.get( Lab.class, "victory_title" ) + "\n\n"
+				+ Messages.get( Lab.class, OpenWorld.isActive() ? "victory_ow" : "victory", clears ) ) );
+	}
+
+	/** Called on arrival anywhere: shows the open world victory once back in town. */
+	public static void showPendingVictory(){
+		if (pendingVictory > 0 && OpenWorld.onBase()){
+			int c = pendingVictory;
+			pendingVictory = 0;
+			showVictory( c );
+		}
 	}
 
 	//--- saving ----------------------------------------------------------------------------------

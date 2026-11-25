@@ -761,6 +761,7 @@ public class GameScene extends PixelScene {
 			if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity() && Dungeon.branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH){
 				if (OpenWorld.isActive() && InterlevelScene.mode == InterlevelScene.Mode.RETURN){
 					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "ow_arrive", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));
+					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();
 				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive() && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw()){
 					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "start"));
 					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();

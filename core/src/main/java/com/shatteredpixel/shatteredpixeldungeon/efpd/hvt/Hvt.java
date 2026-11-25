@@ -68,6 +68,9 @@ public class Hvt {
 	private static boolean active = false;
 	private static boolean[] killed = new boolean[Urban.ZONE_DEPTHS.length];
 	private static int bounties = 0;
+	//open world: the district of the accepted bounty contract, -1 for none
+	private static int contractZone = -1;
+	public static final int CONTRACT_GOLD = 200; //times the district number
 
 	public static boolean isActive(){
 		return active && Urban.isActive();
@@ -75,6 +78,36 @@ public class Hvt {
 
 	public static void start(){
 		active = true;
+	}
+
+	/** Whether districts get a target: always in bounty hunt mode, for a contract in open world. */
+	public static boolean targetsHere(){
+		if (isActive()) return true;
+		return com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.isActive() && contractZone >= 0
+				&& Urban.inCity() && Urban.zoneIndex( Dungeon.depth ) == contractZone;
+	}
+
+	/** Whether the target of a district is still out there. */
+	public static boolean targetAlive( int zone ){
+		if (isActive()) return !killed( zone );
+		return contractZone == zone;
+	}
+
+	public static int contractZone(){
+		return contractZone;
+	}
+
+	public static int contractReward( int zone ){
+		return CONTRACT_GOLD * (zone + 1);
+	}
+
+	public static void acceptContract( int zone ){
+		contractZone = zone;
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.forceCityRegen( Urban.ZONE_DEPTHS[zone] );
+	}
+
+	public static void abandonContract(){
+		contractZone = -1;
 	}
 
 	public static boolean killed( int zone ){
@@ -100,7 +133,7 @@ public class Hvt {
 
 	public static String briefingText( UrbanLevel level ){
 		int zone = Urban.zoneIndex( Dungeon.depth );
-		if (killed( zone ) || level.hvtBossCell < 0){
+		if (!targetAlive( zone ) || level.hvtBossCell < 0){
 			return Messages.get( Hvt.class, "brief_done", zone+1 );
 		}
 		int k = level.hvtKind;
@@ -113,7 +146,7 @@ public class Hvt {
 
 	//shown when the hero arrives in a district
 	public static void brief(){
-		if (!isActive() || !(Dungeon.level instanceof UrbanLevel)) return;
+		if (!targetsHere() || !(Dungeon.level instanceof UrbanLevel)) return;
 		final String text = briefingText( (UrbanLevel) Dungeon.level );
 		GLog.w( text );
 		GameScene.show( new WndMessage( Messages.get( Hvt.class, "brief_title" ) + "\n\n" + text ) );
@@ -125,6 +158,13 @@ public class Hvt {
 		int zone = Urban.zoneIndex( Dungeon.depth );
 		if (zone >= 0 && zone < killed.length) killed[zone] = true;
 		bounties++;
+		//open world: the contract pays out on the spot
+		if (!isActive() && contractZone == zone){
+			contractZone = -1;
+			int reward = contractReward( zone );
+			Dungeon.gold += reward;
+			GLog.p( Messages.get( Hvt.class, "contract_paid", reward ) );
+		}
 
 		Hero hero = Dungeon.hero;
 		GLog.n( Messages.get( Hvt.class, "alarm" ) );
@@ -210,6 +250,7 @@ public class Hvt {
 		active = false;
 		killed = new boolean[Urban.ZONE_DEPTHS.length];
 		bounties = 0;
+		contractZone = -1;
 	}
 
 	private static final String NODE     = "efpd_hvt";
@@ -222,6 +263,7 @@ public class Hvt {
 		node.put( ACTIVE, active );
 		node.put( KILLED, killed );
 		node.put( BOUNTIES, bounties );
+		node.put( "contract", contractZone );
 		bundle.put( NODE, node );
 	}
 
@@ -233,6 +275,7 @@ public class Hvt {
 		boolean[] k = node.getBooleanArray( KILLED );
 		if (k != null) System.arraycopy( k, 0, killed, 0, Math.min( k.length, killed.length ) );
 		bounties = node.getInt( BOUNTIES );
+		contractZone = node.contains( "contract" ) ? node.getInt( "contract" ) : -1;
 	}
 
 }

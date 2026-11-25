@@ -46,12 +46,36 @@ public class Regen {
 	public static final int CITY_REGEN_TURNS = 3 * DayNight.DAY_LENGTH;
 	private static long[] cityVisit = new long[8];
 	private static int[]  cityGen   = new int[8];
+	//open world Lab entries: a fresh complex every time
+	private static int labGen = 0;
 
 	public static void reset(){
 		lastVisit  = new long[SIZE];
 		generation = new int[SIZE];
 		cityVisit  = new long[8];
 		cityGen    = new int[8];
+		labGen     = 0;
+	}
+
+	/** Rebuilds a city district (streets and building floors) on the next visit, e.g. for a bounty contract. */
+	public static void forceCityRegen( int depth ){
+		int z = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( depth );
+		cityGen[z]++;
+		cityVisit[z] = 0;
+		for (Integer key : Dungeon.generatedLevels.toArray( new Integer[0] )){
+			int b = key / 1000, d = key % 1000;
+			if (d == depth && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity( b )) Dungeon.generatedLevels.remove( key );
+		}
+	}
+
+	/** Builds the Lab anew on the next entry. */
+	public static void forceLabRegen(){
+		labGen++;
+		Dungeon.generatedLevels.remove( Integer.valueOf( com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_DEPTH + 1000*com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH ) );
+	}
+
+	public static boolean cityHeldByCorpseAt( int depth ){
+		return cityHeldByCorpse( depth );
 	}
 
 	private static boolean eligible( int depth, int branch ){
@@ -132,6 +156,7 @@ public class Regen {
 			int g = cityGen[com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( depth )];
 			return g == 0 ? seed : seed ^ (0x7F4A7C159E3779B9L * g);
 		}
+		if (branch == com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH) return labGen == 0 ? seed : seed ^ (0x5851F42D4C957F2DL * labGen);
 		if (branch != 0 || depth < 0 || depth >= SIZE || generation[depth] == 0) return seed;
 		return seed ^ (0x9E3779B97F4A7C15L * generation[depth]);
 	}
@@ -146,6 +171,7 @@ public class Regen {
 		node.put( GEN, generation );
 		node.put( "city_visit", cityVisit );
 		node.put( "city_gen", cityGen );
+		node.put( "lab_gen", labGen );
 		bundle.put( NODE, node );
 	}
 
@@ -159,6 +185,7 @@ public class Regen {
 		if (cv != null) System.arraycopy( cv, 0, cityVisit, 0, Math.min(cv.length, cityVisit.length) );
 		int[] cg = node.getIntArray( "city_gen" );
 		if (cg != null) System.arraycopy( cg, 0, cityGen, 0, Math.min(cg.length, cityGen.length) );
+		labGen = node.getInt( "lab_gen" );
 		int[] g = node.getIntArray( GEN );
 		if (g != null) System.arraycopy( g, 0, generation, 0, Math.min(g.length, SIZE) );
 	}

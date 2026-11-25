@@ -69,9 +69,9 @@ public class Keycard extends Item {
 		return new ItemSprite.Glowing( 0x33CCFF, 1.5f );
 	}
 
-	/** Keycards only matter in the modes whose loot reaches the stash. */
+	/** Keycards drop everywhere but the Lab itself and daily runs. */
 	public static boolean canDrop(){
-		return !OpenWorld.isActive() && !Lab.isActive() && !Dungeon.daily;
+		return !Lab.isActive() && !Lab.inLab() && !Dungeon.daily;
 	}
 
 	/** Rolls a keycard for a slain dungeon boss in extraction mode; it drops at the hero's feet. */

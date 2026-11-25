@@ -86,6 +86,7 @@ public class Extraction {
 				Statistics.efpdBossKills++;
 				//open world: the next region opens on the region map
 				int next = OpenWorld.regionOf(Dungeon.depth) + 1;
+				com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.rollForBoss( Dungeon.depth );
 				if (first && Dungeon.depth == RingSage.YOG_DEPTH){
 					RingSage.onYogSlain();
 				}

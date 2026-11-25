@@ -171,7 +171,7 @@ public class UrbanLevel extends Level {
 		//bounty hunt: the target hides in one of the buildings farthest from the plaza,
 		//and the district vault takes over another building
 		int bossB = -1, vaultB = -1;
-		if (Hvt.isActive() && buildings.size() >= 3){
+		if (Hvt.targetsHere() && buildings.size() >= 3){
 			hvtKind = Random.Int( Hvt.KINDS );
 			hvtSite = Random.Int( Hvt.SITES );
 			ArrayList<Integer> order = new ArrayList<>();
@@ -441,7 +441,7 @@ public class UrbanLevel extends Level {
 			mob.pos = cell;
 			mobs.add( mob );
 		}
-		if (Hvt.isActive() && hvtBossCell >= 0 && !Hvt.killed( zone() )){
+		if (Hvt.targetsHere() && hvtBossCell >= 0 && Hvt.targetAlive( zone() )){
 			placeTarget();
 		}
 	}

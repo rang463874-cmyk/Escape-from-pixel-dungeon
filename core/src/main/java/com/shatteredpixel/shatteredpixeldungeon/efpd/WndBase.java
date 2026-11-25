@@ -93,6 +93,9 @@ public class WndBase extends Window {
 		addButton( Messages.get(this, "market"), new Runnable() { public void run() {
 			hide(); showMarketMenu();
 		}});
+		addButton( Messages.get(this, "bounties"), new Runnable() { public void run() {
+			hide(); showBounties();
+		}});
 		addButton( Messages.get(this, "training"), new Runnable() { public void run() {
 			hide(); TownServices.showTraining();
 		}});
@@ -110,6 +113,38 @@ public class WndBase extends Window {
 		}});
 
 		resize( width, (int)pos );
+	}
+
+	//the bounty board: one HVT contract at a time, in an unlocked city district
+	public static void showBounties(){
+		WndFacilities.Builder b = new WndFacilities.Builder();
+		final int active = com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.contractZone();
+		String desc;
+		if (active >= 0){
+			desc = Messages.get(WndBase.class, "bounty_active", active + 1, com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.contractReward( active ));
+			b.add( Messages.get(WndBase.class, "bounty_abandon"), true, new Runnable() { public void run() {
+				com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.abandonContract();
+				GLog.i( Messages.get(WndBase.class, "bounty_abandoned") );
+				OpenWorld.saveRun();
+			}});
+		} else {
+			desc = Messages.get(WndBase.class, "bounty_desc");
+			for (int z = 0; z < com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS.length; z++){
+				final int zone = z;
+				boolean open = OpenWorld.regionUnlocked( z );
+				boolean corpse = Regen.cityHeldByCorpseAt( com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS[z] );
+				String label = !open ? Messages.get(WndWorldMap.class, "locked", Messages.get(WndWorldMap.class, "city_district", z + 1))
+						: corpse ? Messages.get(WndBase.class, "bounty_corpse", z + 1)
+						: Messages.get(WndBase.class, "bounty_entry", z + 1, com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.contractReward( z ));
+				b.add( label, open && !corpse, new Runnable() { public void run() {
+					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.acceptContract( zone );
+					GLog.p( Messages.get(WndBase.class, "bounty_accepted", zone + 1) );
+					OpenWorld.saveRun();
+				}});
+			}
+		}
+		b.add( Messages.get(TownServices.class, "back"), true, new Runnable() { public void run() {} } );
+		b.show( Messages.get(WndBase.class, "bounties"), desc );
 	}
 
 	//trading: supplies, rare goods, the mystery crate, selling

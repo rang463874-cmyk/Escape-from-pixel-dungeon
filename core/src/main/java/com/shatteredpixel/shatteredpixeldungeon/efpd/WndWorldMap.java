@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.efpd;
 
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
@@ -45,7 +46,7 @@ public class WndWorldMap extends WndOptions {
 
 	private static String[] labels(){
 		int n = OpenWorld.REGION_START.length;
-		String[] labels = new String[n + 2];
+		String[] labels = new String[n + 3];
 		for (int r = 0; r < n; r++){
 			String name = Messages.get(OpenWorld.class, "region_" + r);
 			labels[r] = OpenWorld.regionUnlocked(r)
@@ -53,7 +54,8 @@ public class WndWorldMap extends WndOptions {
 					: Messages.get(WndWorldMap.class, "locked", name);
 		}
 		labels[n] = Messages.get(WndWorldMap.class, "city");
-		labels[n+1] = Messages.get(WndWorldMap.class, "stay");
+		labels[n+1] = Messages.get(WndWorldMap.class, "lab_entry", com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.keycardsAvailable());
+		labels[n+2] = Messages.get(WndWorldMap.class, "stay");
 		return labels;
 	}
 
@@ -72,6 +74,7 @@ public class WndWorldMap extends WndOptions {
 
 	@Override
 	protected boolean enabled( int index ) {
+		if (index == OpenWorld.REGION_START.length + 1) return com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.keycardsAvailable() > 0;
 		return index >= OpenWorld.REGION_START.length || OpenWorld.regionUnlocked( index );
 	}
 
@@ -81,7 +84,24 @@ public class WndWorldMap extends WndOptions {
 			OpenWorld.travelTo( OpenWorld.REGION_START[index], 0 );
 		} else if (index == OpenWorld.REGION_START.length){
 			showCity();
+		} else if (index == OpenWorld.REGION_START.length + 1){
+			showLab();
 		}
+	}
+
+	/** The Lab: spends a keycard, carried ones first. */
+	private static void showLab(){
+		GameScene.show( new WndOptions( Icons.get(Icons.STAIRS), Messages.get(WndWorldMap.class, "lab"),
+				Messages.get(WndWorldMap.class, "lab_desc", com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.keycardsAvailable()),
+				Messages.get(WndWorldMap.class, "lab_go"),
+				Messages.get(WndWorldMap.class, "stay") ){
+			@Override
+			protected void onSelect( int index ) {
+				if (index == 0 && !com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.enterFromOpenWorld()){
+					GLog.w( Messages.get(WndWorldMap.class, "lab_no_card") );
+				}
+			}
+		});
 	}
 
 	/** The ruined city's districts: each opens together with the dungeon region of its rank. */
