@@ -154,12 +154,24 @@ public class OpenWorld {
 		com.shatteredpixel.shatteredpixeldungeon.items.Amulet amulet =
 				hero.belongings.getItem( com.shatteredpixel.shatteredpixeldungeon.items.Amulet.class );
 		if (amulet != null) Stash.depositOne( hero, amulet );
+		liftAmuletCurse( hero );
 		com.shatteredpixel.shatteredpixeldungeon.Badges.validateHappyEnd();
 		com.shatteredpixel.shatteredpixeldungeon.Badges.saveGlobal();
 		pendingSurvival = true;
 		saveRun();
 		com.shatteredpixel.shatteredpixeldungeon.scenes.SurfaceScene.efpdContinueRun = true;
 		Game.switchScene( com.shatteredpixel.shatteredpixeldungeon.scenes.SurfaceScene.class );
+	}
+
+	/**
+	 * The ascension curse (stacking enemy buffs while carrying the amulet up) ends once the
+	 * amulet is out of the hero's hands: brought out, or left behind in a corpse bag.
+	 */
+	public static void liftAmuletCurse( Hero hero ){
+		if (hero == null) return;
+		if (hero.belongings.getItem( com.shatteredpixel.shatteredpixeldungeon.items.Amulet.class ) != null) return;
+		com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff.detach( hero,
+				com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AscensionChallenge.class );
 	}
 
 	/** Called on arrival in town: the survival message after the ending. */
