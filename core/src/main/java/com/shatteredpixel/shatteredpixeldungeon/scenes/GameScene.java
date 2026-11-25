@@ -754,6 +754,8 @@ public class GameScene extends PixelScene {
 				GLog.p(Messages.get(OpenWorld.class, "at_base"));
 				//EFPD: quest givers who joined move into town
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.populateBase();
+				//EFPD: back from the ending
+				OpenWorld.showPendingSurvival();
 				//EFPD: and the ring sage, once Yog-Dzewa has fallen
 				com.shatteredpixel.shatteredpixeldungeon.efpd.RingSage.populateBase();
 			}

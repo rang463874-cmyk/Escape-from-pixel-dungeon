@@ -151,7 +151,7 @@ public class SewerLevel extends RegularLevel {
 			//EFPD: in open world mode the surface is the base town
 			if (OpenWorld.isActive()){
 				if (hero.belongings.getItem( Amulet.class ) != null){
-					OpenWorld.recordSurvival( hero );
+					OpenWorld.escapeWithAmulet( hero );
 				} else {
 					OpenWorld.showReturnWindow( hero, null );
 				}

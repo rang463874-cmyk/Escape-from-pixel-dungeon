@@ -65,6 +65,9 @@ import java.util.GregorianCalendar;
 
 public class SurfaceScene extends PixelScene {
 
+	//EFPD: open world runs go on after the ending, back in the base town
+	public static boolean efpdContinueRun = false;
+
 	private static final int FRAME_WIDTH    = 88;
 	private static final int FRAME_HEIGHT    = 125;
 
@@ -261,6 +264,11 @@ public class SurfaceScene extends PixelScene {
 
 		RedButton gameOver = new RedButton( Messages.get(this, "exit") ) {
 			protected void onClick() {
+				if (efpdContinueRun){
+					efpdContinueRun = false;
+					com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.travelToBase();
+					return;
+				}
 				Game.switchScene( RankingsScene.class );
 			}
 		};

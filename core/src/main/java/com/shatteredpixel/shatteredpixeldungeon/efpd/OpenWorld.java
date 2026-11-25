@@ -138,6 +138,39 @@ public class OpenWorld {
 		});
 	}
 
+	//shown once the hero is back in town after the ending
+	private static boolean pendingSurvival = false;
+
+	/**
+	 * Bringing the amulet out of the dungeon: the ending plays, the amulet goes into the stash
+	 * as a trophy, a survival is recorded, and the world goes on in the base town.
+	 */
+	public static void escapeWithAmulet( final Hero hero ){
+		if (!Statistics.efpdSurvived){
+			Statistics.efpdSurvived = true;
+			Statistics.efpdSurvivedTurn = (int) Statistics.duration;
+		}
+		Statistics.ascended = true;
+		com.shatteredpixel.shatteredpixeldungeon.items.Amulet amulet =
+				hero.belongings.getItem( com.shatteredpixel.shatteredpixeldungeon.items.Amulet.class );
+		if (amulet != null) Stash.depositOne( hero, amulet );
+		com.shatteredpixel.shatteredpixeldungeon.Badges.validateHappyEnd();
+		com.shatteredpixel.shatteredpixeldungeon.Badges.saveGlobal();
+		pendingSurvival = true;
+		saveRun();
+		com.shatteredpixel.shatteredpixeldungeon.scenes.SurfaceScene.efpdContinueRun = true;
+		Game.switchScene( com.shatteredpixel.shatteredpixeldungeon.scenes.SurfaceScene.class );
+	}
+
+	/** Called on arrival in town: the survival message after the ending. */
+	public static void showPendingSurvival(){
+		if (!pendingSurvival) return;
+		pendingSurvival = false;
+		GameScene.show( new com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage(
+				Messages.get(OpenWorld.class, "survived", Statistics.efpdSurvivedTurn, Dungeon.hero.lvl)
+				+ "\n\n" + Messages.get(OpenWorld.class, "amulet_stashed") ) );
+	}
+
 	/** Bringing the amulet out of the dungeon records a survival, then the game goes on. */
 	public static void recordSurvival( Hero hero ){
 		if (!Statistics.efpdSurvived){

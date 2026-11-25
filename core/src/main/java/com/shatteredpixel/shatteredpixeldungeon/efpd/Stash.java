@@ -76,7 +76,6 @@ public class Stash {
 
 	//quest items and other run-bound items which make no sense in a new run
 	private static final Class<?>[] NOT_STASHABLE = new Class<?>[]{
-			Amulet.class,
 			CorpseDust.class,
 			Embers.class,
 			DwarfToken.class,
@@ -346,6 +345,8 @@ public class Stash {
 
 	/** Removes an item from the stash and gives it to the hero. */
 	public static void withdraw( Hero hero, Item item ){
+		//the amulet stays in the stash as a trophy of a finished run
+		if (item instanceof Amulet) return;
 		if (!items.remove(item)) return;
 		save();
 

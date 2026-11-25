@@ -139,14 +139,16 @@ public class WndStash extends Window {
 	}
 
 	private void showItem( final Item item ){
-		final boolean canWithdraw = Stash.canWithdraw();
+		final boolean canWithdraw = Stash.canWithdraw()
+				&& !(item instanceof com.shatteredpixel.shatteredpixeldungeon.items.Amulet);
 		final boolean stack = item.quantity() > 1;
 		String[] options = stack
 				? new String[]{ Messages.get(WndStash.class, "take_all", item.quantity()), Messages.get(WndStash.class, "take_some") }
 				: new String[]{ Messages.get(WndStash.class, "take") };
 		GameScene.show( new WndOptions( new ItemSprite(item),
 				Messages.titleCase( item.title() ),
-				item.info() + "\n\n" + Weight.infoLine(item),
+				item.info() + "\n\n" + (item instanceof com.shatteredpixel.shatteredpixeldungeon.items.Amulet
+						? Messages.get(WndStash.class, "amulet_trophy") : Weight.infoLine(item)),
 				options ){
 			@Override
 			protected boolean enabled(int index) {
