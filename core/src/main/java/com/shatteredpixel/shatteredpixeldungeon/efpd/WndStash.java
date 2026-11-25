@@ -73,8 +73,19 @@ public class WndStash extends Window {
 		btnGold = new RedButton( "" ){
 			@Override
 			protected void onClick() {
-				Stash.withdrawGold();
-				refresh();
+				if (Stash.gold <= 1){
+					Stash.withdrawGold();
+					refresh();
+					return;
+				}
+				GameScene.show( new WndAmount( Messages.get(WndStash.class, "gold_amount"),
+						Messages.get(WndStash.class, "unit_gold"), Stash.gold, Stash.gold, new WndAmount.Listener() {
+					@Override
+					public void onAmount( int amount ) {
+						Stash.withdrawGold( amount );
+						refresh();
+					}
+				} ) );
 			}
 		};
 		add( btnGold );
@@ -129,10 +140,14 @@ public class WndStash extends Window {
 
 	private void showItem( final Item item ){
 		final boolean canWithdraw = Stash.canWithdraw();
+		final boolean stack = item.quantity() > 1;
+		String[] options = stack
+				? new String[]{ Messages.get(WndStash.class, "take_all", item.quantity()), Messages.get(WndStash.class, "take_some") }
+				: new String[]{ Messages.get(WndStash.class, "take") };
 		GameScene.show( new WndOptions( new ItemSprite(item),
 				Messages.titleCase( item.title() ),
 				item.info() + "\n\n" + Weight.infoLine(item),
-				Messages.get(WndStash.class, "take") ){
+				options ){
 			@Override
 			protected boolean enabled(int index) {
 				return canWithdraw;
@@ -140,9 +155,19 @@ public class WndStash extends Window {
 
 			@Override
 			protected void onSelect(int index) {
-				if (index == 0 && Stash.canWithdraw()){
+				if (!Stash.canWithdraw()) return;
+				if (index == 0){
 					Stash.withdraw( Dungeon.hero, item );
 					refresh();
+				} else if (index == 1){
+					GameScene.show( new WndAmount( Messages.titleCase( item.name() ),
+							Messages.get(WndStash.class, "unit_items"), item.quantity(), 1, new WndAmount.Listener() {
+						@Override
+						public void onAmount( int amount ) {
+							Stash.withdraw( Dungeon.hero, item, amount );
+							refresh();
+						}
+					} ) );
 				}
 			}
 		});

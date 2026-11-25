@@ -335,9 +335,69 @@ public class Stash {
 	}
 
 	public static void withdrawGold(){
-		if (gold <= 0) return;
-		Dungeon.gold += gold;
-		gold = 0;
+		withdrawGold( gold );
+	}
+
+	/** Takes part of a stack out of the stash; the whole stack if amount covers it. */
+	public static void withdraw( Hero hero, Item item, int amount ){
+		if (!items.contains( item )) return;
+		if (amount >= item.quantity()){
+			withdraw( hero, item );
+			return;
+		}
+		Item part = item.split( amount );
+		if (part == null) return;
+		save();
+		part.identify(false);
+		if (!part.collect()){
+			Dungeon.level.drop( part, hero.pos ).sprite.drop();
+		}
+		saveRun();
+	}
+
+	public static void withdrawGold( int amount ){
+		amount = Math.min( amount, gold );
+		if (amount <= 0) return;
+		Dungeon.gold += amount;
+		gold -= amount;
+		save();
+		Item.updateQuickslot();
+		saveRun();
+	}
+
+	/**
+	 * Takes one unit (or a whole stack of things that only work as stacks) out of the stash
+	 * without handing it to the hero, e.g. straight into an alchemy slot.
+	 */
+	public static Item takeForUse( Item item, boolean wholeStack ){
+		if (!items.contains( item )) return null;
+		Item out;
+		if (wholeStack || item.quantity() <= 1){
+			items.remove( item );
+			out = item;
+		} else {
+			out = item.split( 1 );
+		}
+		if (out != null) out.identify(false);
+		save();
+		saveRun();
+		return out;
+	}
+
+	/** Returns an item taken out with takeForUse, stacking it onto a matching stack. */
+	public static void putBack( Item item ){
+		load();
+		boolean merged = false;
+		if (item.stackable){
+			for (Item i : items){
+				if (i.isSimilar( item )){
+					i.quantity( i.quantity() + item.quantity() );
+					merged = true;
+					break;
+				}
+			}
+		}
+		if (!merged) items.add( item );
 		save();
 		saveRun();
 	}

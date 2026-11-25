@@ -90,19 +90,46 @@ public class WndBase extends Window {
 			Stash.depositGold();
 			GLog.p( Messages.get(WndBase.class, "gold_stored", amount) );
 		}});
-		addButton( Messages.get(WndHideout.class, "sell"), new Runnable() { public void run() {
-			hide(); Shopkeeper.sell();
+		addButton( Messages.get(this, "market"), new Runnable() { public void run() {
+			hide(); showMarketMenu();
 		}});
-		addButton( Messages.get(WndHideout.class, "buy"), new Runnable() { public void run() {
-			hide(); GameScene.show( new WndHideoutShop() );
+		addButton( Messages.get(this, "training"), new Runnable() { public void run() {
+			hide(); TownServices.showTraining();
 		}});
 		addButton( Messages.get(WndHideout.class, "alchemy"), new Runnable() { public void run() {
 			hide();
+			//the stash's alchemical energy is usable at the town's alchemy station
+			Stash.load();
+			if (Stash.energy > 0){
+				Dungeon.energy += Stash.energy;
+				Stash.energy = 0;
+				Stash.save();
+			}
 			AlchemyScene.clearToolkit();
 			ShatteredPixelDungeon.switchScene( AlchemyScene.class );
 		}});
 
 		resize( width, (int)pos );
+	}
+
+	//trading: supplies, rare goods, the mystery crate, selling
+	public static void showMarketMenu(){
+		WndFacilities.Builder b = new WndFacilities.Builder();
+		b.add( Messages.get(WndHideout.class, "buy"), true, new Runnable() { public void run() {
+			GameScene.show( new WndHideoutShop() );
+		}});
+		b.add( Messages.get(TownServices.class, "market_title"), true, new Runnable() { public void run() {
+			TownServices.showMarket();
+		}});
+		b.add( Messages.get(TownServices.class, "crate_title"), true, new Runnable() { public void run() {
+			TownServices.showCrate();
+		}});
+		b.add( Messages.get(WndHideout.class, "sell"), true, new Runnable() { public void run() {
+			Shopkeeper.sell();
+		}});
+		b.add( Messages.get(TownServices.class, "back"), true, new Runnable() { public void run() {} } );
+		b.show( Messages.get(WndBase.class, "market"),
+				Messages.get(WndBase.class, "market_desc", Dungeon.gold, Facilities.haveGold() - Dungeon.gold) );
 	}
 
 	private void addButton( String label, final Runnable action ){

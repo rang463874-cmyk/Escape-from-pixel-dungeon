@@ -53,7 +53,7 @@ import java.util.ArrayList;
 public class WndFacilities {
 
 	/** A WndOptions whose buttons each run an action. */
-	private static class Menu extends WndOptions {
+	static class Menu extends WndOptions {
 		//WndOptions asks enabled() from its own constructor, before this class's fields are set,
 		//so the button states are handed over through this static field first
 		private static ArrayList<Boolean> pendingEnabled;
@@ -84,7 +84,7 @@ public class WndFacilities {
 		}
 	}
 
-	private static class Builder {
+	static class Builder {
 		final ArrayList<String> labels = new ArrayList<>();
 		final ArrayList<Runnable> actions = new ArrayList<>();
 		final ArrayList<Boolean> enabled = new ArrayList<>();

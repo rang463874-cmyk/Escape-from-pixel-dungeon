@@ -94,16 +94,33 @@ public class WndHideoutShop extends WndOptions {
 		return labels;
 	}
 
+	//in the open world town, the stash's gold pays too (carried gold first)
+	static boolean townPays(){
+		return OpenWorld.isActive() && OpenWorld.onBase();
+	}
+
+	static int gold(){
+		return townPays() ? Facilities.haveGold() : Dungeon.gold;
+	}
+
+	static boolean pay( int amount ){
+		if (townPays()) return Facilities.spendGold( amount );
+		if (Dungeon.gold < amount) return false;
+		Dungeon.gold -= amount;
+		return true;
+	}
+
 	public WndHideoutShop(){
 		super( new ItemSprite(ItemSpriteSheet.GOLD),
 				Messages.get(WndHideoutShop.class, "title"),
-				Messages.get(WndHideoutShop.class, "desc", Dungeon.gold),
+				townPays() ? Messages.get(WndHideoutShop.class, "desc_town", Dungeon.gold, gold() - Dungeon.gold)
+				           : Messages.get(WndHideoutShop.class, "desc", Dungeon.gold),
 				labels() );
 	}
 
 	@Override
 	protected boolean enabled( int index ) {
-		return index >= shown.length || Dungeon.gold >= PRICES[shown[index]];
+		return index >= shown.length || gold() >= PRICES[shown[index]];
 	}
 
 	@Override
@@ -118,9 +135,8 @@ public class WndHideoutShop extends WndOptions {
 
 	@Override
 	protected void onSelect( int index ) {
-		if (index >= shown.length || Dungeon.gold < PRICES[shown[index]]) return;
+		if (index >= shown.length || !pay( PRICES[shown[index]] )) return;
 
-		Dungeon.gold -= PRICES[shown[index]];
 		Item item = make(shown[index]);
 		if (!item.collect()){
 			Dungeon.level.drop( item, Dungeon.hero.pos ).sprite.drop();

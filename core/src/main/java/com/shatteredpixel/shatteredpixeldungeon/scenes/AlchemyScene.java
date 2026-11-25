@@ -533,6 +533,24 @@ public class AlchemyScene extends PixelScene {
 		align(btnGuide);
 		add(btnGuide);
 
+		//EFPD: open world town: pick ingredients from the stash
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.isActive()
+				&& com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.onBase()){
+			StyledButton btnStash = new StyledButton( Chrome.Type.TOAST_TR,
+					Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.WndStashPick.class, "button")){
+				@Override
+				protected void onClick() {
+					super.onClick();
+					AlchemyScene.this.addToFront(new com.shatteredpixel.shatteredpixeldungeon.efpd.WndStashPick(AlchemyScene.this));
+				}
+			};
+			btnStash.icon(new ItemSprite(ItemSpriteSheet.CHEST));
+			btnStash.setSize(btnStash.reqWidth()+4, 18);
+			btnStash.setPos(centerW - btnStash.width()/2f, btnGuide.top() - btnStash.height() - 2);
+			align(btnStash);
+			add(btnStash);
+		}
+
 		TrinketCatalyst cata = Dungeon.hero.belongings.getItem(TrinketCatalyst.class);
 		if (cata != null && cata.hasRolledTrinkets()){
 			addToFront(new TrinketCatalyst.WndTrinket(cata));
@@ -855,12 +873,45 @@ public class AlchemyScene extends PixelScene {
 		super.destroy();
 	}
 	
+	//EFPD: in the open world town, ingredients can come straight from the stash
+	private static final java.util.Set<Item> fromStash =
+			java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Item, Boolean>());
+
+	private static boolean returnToStash( Item item ){
+		if (!fromStash.remove(item)) return false;
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Stash.putBack(item);
+		return true;
+	}
+
+	/** Puts a stash item into the first free slot. Returns false if every slot is taken. */
+	public boolean addFromStash( Item item ){
+		synchronized (inputs) {
+			for (int i = 0; i < inputs.length; i++) {
+				if (inputs[i] != null && inputs[i].item() == null) {
+					inputs[i].item(item);
+					fromStash.add(item);
+					updateState();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean slotFree(){
+		synchronized (inputs) {
+			for (InputButton b : inputs) if (b != null && b.item() == null) return true;
+		}
+		return false;
+	}
+
 	public void clearSlots(){
 		synchronized ( inputs ) {
 			for (int i = 0; i < inputs.length; i++) {
 				if (inputs[i] != null && inputs[i].item() != null) {
 					Item item = inputs[i].item();
-					if (!item.collect()) {
+					//EFPD: ingredients taken from the stash go back to the stash
+					if (!returnToStash(item) && !item.collect()) {
 						Dungeon.level.drop(item, Dungeon.hero.pos);
 					}
 					inputs[i].item(null);
@@ -999,7 +1050,7 @@ public class AlchemyScene extends PixelScene {
 					super.onClick();
 					Item item = InputButton.this.item;
 					if (item != null) {
-						if (!item.collect()) {
+						if (!returnToStash(item) && !item.collect()) {
 							Dungeon.level.drop(item, Dungeon.hero.pos);
 						}
 						InputButton.this.item(null);

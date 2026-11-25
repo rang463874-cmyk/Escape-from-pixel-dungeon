@@ -18,8 +18,8 @@ allprojects {
 
         //Full releases gets +2 on version code, needed for an F-Droid quirk
         //EFPD: own version line. The code must stay above Shattered's (922) so saves stay compatible.
-        appVersionCode = 1016
-        appVersionName = '0.13.0'
+        appVersionCode = 1017
+        appVersionName = '0.14.0'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 
