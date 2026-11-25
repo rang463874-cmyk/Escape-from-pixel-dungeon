@@ -77,6 +77,7 @@ public class WndDevTools extends Window {
 
 	public static final int MAX_LEVEL    = 30;
 	public static final int MAX_QUANTITY = 999;
+	public static final int MAX_DEPTH    = 26;
 
 	//remembered between openings
 	private static int level    = 0;
@@ -85,28 +86,204 @@ public class WndDevTools extends Window {
 	private RedButton btnLevel;
 	private RedButton btnQuantity;
 
+	//pages: the main menu, currencies, debug actions, or an item category (index >= 0)
+	public static final int MAIN = -1, CURRENCY = -2, DEBUG = -3;
+
+	private final int page;
+
 	public WndDevTools(){
+		this( MAIN );
+	}
+
+	public WndDevTools( int page ){
 		super();
+		this.page = page;
 
 		int width = PixelScene.landscape() ? WIDTH_L : WIDTH_P;
 		int height = (int)Math.min( HEIGHT, PixelScene.uiCamera.height - 20 );
 		resize( width, height );
 
-		RenderedTextBlock title = PixelScene.renderTextBlock( Messages.get(this, "title"), 9 );
+		ArrayList<Object[]> cats = categories();
+		String titleText = page == MAIN ? Messages.get(this, "title")
+				: page == CURRENCY ? Messages.get(this, "cat_currency")
+				: page == DEBUG ? Messages.get(this, "cat_debug")
+				: (String) cats.get( page )[0];
+		RenderedTextBlock title = PixelScene.renderTextBlock( titleText, 9 );
 		title.hardlight( TITLE_COLOR );
 		title.setPos( (width - title.width())/2f, 0 );
 		add( title );
 		float pos = title.bottom() + GAP;
 
-		//upgrade level row
-		pos = addStepper( Messages.get(this, "level"), width, pos, true );
-		//quantity row
-		pos = addStepper( Messages.get(this, "quantity"), width, pos, false );
+		if (page == MAIN){
+			pos = buildMain( width, pos );
+		} else {
+			RedButton back = new RedButton( Messages.get(this, "back"), 7 ){
+				@Override
+				protected void onClick() {
+					hide();
+					GameScene.show( new WndDevTools( MAIN ) );
+				}
+			};
+			back.setRect( 0, pos, width, ROW );
+			add( back );
+			pos = back.bottom() + GAP;
+			if (page >= 0) pos = addStepper( Messages.get(this, "level"), width, pos, true );
+			pos = addStepper( Messages.get(this, "quantity"), width, pos, false );
+		}
 
 		ScrollingListPane list = new ScrollingListPane();
 		add( list );
 		list.setRect( 0, pos + GAP, width, height - pos - GAP );
-		fillList( list );
+		if (page == MAIN)          fillMenu( list, cats );
+		else if (page == CURRENCY) fillCurrency( list );
+		else if (page == DEBUG)    fillDebug( list );
+		else                       fillCategory( list, (java.util.List<Class<?>>) cats.get( page )[1] );
+	}
+
+	//--- main menu: floors and the list of pages -------------------------------------------------
+
+	private float buildMain( int width, float pos ){
+		RenderedTextBlock where = PixelScene.renderTextBlock( Messages.get(this, "where", locationName()), 7 );
+		where.maxWidth( width );
+		where.setPos( 0, pos );
+		add( where );
+		pos = where.bottom() + GAP;
+
+		float hw = (width - GAP) / 2f;
+		RedButton up = new RedButton( Messages.get(this, "floor_up"), 7 ){
+			@Override
+			protected void onClick() {
+				travel( -1 );
+			}
+		};
+		up.setRect( 0, pos, hw, ROW );
+		add( up );
+		RedButton down = new RedButton( Messages.get(this, "floor_down"), 7 ){
+			@Override
+			protected void onClick() {
+				travel( +1 );
+			}
+		};
+		down.setRect( hw + GAP, pos, hw, ROW );
+		add( down );
+		pos += ROW + GAP;
+
+		RedButton jump = new RedButton( Messages.get(this, "floor_jump"), 7 ){
+			@Override
+			protected void onClick() {
+				askDepth();
+			}
+		};
+		jump.setRect( 0, pos, width, ROW );
+		add( jump );
+		return pos + ROW + GAP;
+	}
+
+	private void fillMenu( ScrollingListPane list, ArrayList<Object[]> cats ){
+		list.addTitle( Messages.get(this, "pages") );
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.GOLD), Messages.get(this, "cat_currency") ){
+			@Override protected void give() { open( CURRENCY ); }
+		});
+		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.ARTIFACT_HOURGLASS), Messages.get(this, "cat_debug") ){
+			@Override protected void give() { open( DEBUG ); }
+		});
+		list.addTitle( Messages.get(this, "spawn") );
+		for (int i = 0; i < cats.size(); i++){
+			final int idx = i;
+			Object[] c = cats.get( i );
+			java.util.List<?> classes = (java.util.List<?>) c[1];
+			Item sample = classes.isEmpty() ? null : (Item) Reflection.newInstance( (Class<?>) classes.get( 0 ) );
+			Image icon = sample != null ? new ItemSprite( sample ) : new ItemSprite( ItemSpriteSheet.SOMETHING );
+			list.addItem( new ListEntry( icon, c[0] + " (" + classes.size() + ")" ){
+				@Override protected void give() { open( idx ); }
+			});
+		}
+	}
+
+	private void open( int p ){
+		hide();
+		GameScene.show( new WndDevTools( p ) );
+	}
+
+	private static String locationName(){
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.inLab()) return Messages.get(WndDevTools.class, "loc_lab");
+		if (OpenWorld.onBase()) return Messages.get(WndDevTools.class, "loc_base");
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()){
+			return Messages.get(WndDevTools.class, "loc_city",
+					com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( Dungeon.depth ) + 1);
+		}
+		if (Dungeon.branch != 0) return Messages.get(WndDevTools.class, "loc_branch", Dungeon.depth);
+		return Messages.get(WndDevTools.class, "loc_depth", Dungeon.depth);
+	}
+
+	/** One floor up (-1) or down (+1), or the previous / next district in the city. */
+	private void travel( int dir ){
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.inLab()){
+			GLog.w( Messages.get(WndDevTools.class, "no_floors") );
+			return;
+		}
+		int depth, branch;
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()){
+			int[] zones = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS;
+			int z = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex( Dungeon.depth ) + dir;
+			if (z < 0 || z >= zones.length){
+				GLog.w( Messages.get(WndDevTools.class, "no_more") );
+				return;
+			}
+			depth = zones[z];
+			branch = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH;
+		} else if (OpenWorld.onBase()){
+			if (dir < 0){
+				GLog.w( Messages.get(WndDevTools.class, "no_more") );
+				return;
+			}
+			depth = 1;
+			branch = 0;
+		} else {
+			depth = Dungeon.depth + dir;
+			branch = 0;
+			if (depth < 1){
+				if (OpenWorld.isActive()){
+					hide();
+					OpenWorld.travelToBase();
+				} else {
+					GLog.w( Messages.get(WndDevTools.class, "no_more") );
+				}
+				return;
+			}
+			if (depth > MAX_DEPTH){
+				GLog.w( Messages.get(WndDevTools.class, "no_more") );
+				return;
+			}
+		}
+		go( depth, branch );
+	}
+
+	private void askDepth(){
+		GameScene.show( new WndTextInput(
+				Messages.get(WndDevTools.class, "floor_jump"),
+				Messages.get(WndDevTools.class, "depth_range", MAX_DEPTH),
+				Integer.toString( Math.max( 1, Dungeon.depth ) ),
+				3, false,
+				Messages.get(WndDevTools.class, "ok"),
+				Messages.get(WndDevTools.class, "cancel") ){
+			@Override
+			public void onSelect( boolean positive, String text ) {
+				if (!positive) return;
+				try {
+					go( clamp( Integer.parseInt( text.trim() ), 1, MAX_DEPTH ), 0 );
+				} catch (NumberFormatException e){
+					GLog.w( Messages.get(WndDevTools.class, "not_number") );
+				}
+			}
+		});
+	}
+
+	private void go( int depth, int branch ){
+		hide();
+		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.arrivalFrom = -1;
+		GLog.i( Messages.get(WndDevTools.class, "moved") );
+		OpenWorld.travelTo( depth, branch );
 	}
 
 	//--- top controls --------------------------------------------------------------------------
@@ -200,9 +377,7 @@ public class WndDevTools extends Window {
 
 	//--- item list -----------------------------------------------------------------------------
 
-	private void fillList( ScrollingListPane list ){
-		//currencies
-		list.addTitle( Messages.get(this, "cat_currency") );
+	private void fillCurrency( ScrollingListPane list ){
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.GOLD), Messages.get(this, "gold") ){
 			@Override protected void give() {
 				Dungeon.gold += 1000 * quantity;
@@ -218,8 +393,9 @@ public class WndDevTools extends Window {
 			}
 		});
 
-		//debug actions
-		list.addTitle( Messages.get(this, "cat_debug") );
+	}
+
+	private void fillDebug( ScrollingListPane list ){
 		list.addItem( new ListEntry( new ItemSprite(ItemSpriteSheet.POTION_CRIMSON), Messages.get(this, "heal") ){
 			@Override protected void give() {
 				Dungeon.hero.HP = Dungeon.hero.HT;
@@ -281,6 +457,11 @@ public class WndDevTools extends Window {
 			}
 		});
 
+	}
+
+	/** Item categories for spawning: { title, list of item classes }. */
+	private static ArrayList<Object[]> categories(){
+		ArrayList<Object[]> list = new ArrayList<>();
 		//melee weapons and guns, by tier
 		ArrayList<Class<?>> guns = new ArrayList<>();
 		for (int t = 0; t < Generator.wepTiers.length; t++){
@@ -288,54 +469,64 @@ public class WndDevTools extends Window {
 			for (Class<?> c : Generator.wepTiers[t].classes){
 				if (Gun.class.isAssignableFrom(c)) guns.add(c); else melee.add(c);
 			}
-			addCategory( list, Messages.get(this, "cat_melee", t+1), melee );
+			addCategory( list, Messages.get(WndDevTools.class, "cat_melee", t+1), melee );
 		}
-		addCategory( list, Messages.get(this, "cat_guns"), guns );
-		addCategory( list, Messages.get(this, "cat_ammo"), Arrays.asList( LightAmmo.class, RifleAmmo.class, ShotgunShell.class ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_guns"), guns );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_ammo"), Arrays.asList( LightAmmo.class, RifleAmmo.class, ShotgunShell.class ) );
 
 		ArrayList<Class<?>> missiles = new ArrayList<>();
 		for (Generator.Category c : Generator.misTiers) missiles.addAll( Arrays.asList(c.classes) );
-		addCategory( list, Messages.get(this, "cat_missile"), missiles );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_missile"), missiles );
 
 		ArrayList<Class<?>> armor = new ArrayList<>();
 		for (Class<?> c : Generator.Category.ARMOR.classes){
 			//class armor needs a hero ability and comes from the crown, skip it
 			if (!ClassArmor.class.isAssignableFrom(c)) armor.add(c);
 		}
-		addCategory( list, Messages.get(this, "cat_armor"), armor );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_armor"), armor );
 
-		addCategory( list, Messages.get(this, "cat_wand"),     Arrays.asList( Generator.Category.WAND.classes ) );
-		addCategory( list, Messages.get(this, "cat_ring"),     Arrays.asList( Generator.Category.RING.classes ) );
-		addCategory( list, Messages.get(this, "cat_artifact"), Arrays.asList( Generator.Category.ARTIFACT.classes ) );
-		addCategory( list, Messages.get(this, "cat_trinket"),  Arrays.asList( Generator.Category.TRINKET.classes ) );
-		addCategory( list, Messages.get(this, "cat_potion"),   Arrays.asList( Generator.Category.POTION.classes ) );
-		addCategory( list, Messages.get(this, "cat_exotic_potion"), new ArrayList<Class<?>>( ExoticPotion.regToExo.values() ) );
-		addCategory( list, Messages.get(this, "cat_scroll"),   Arrays.asList( Generator.Category.SCROLL.classes ) );
-		addCategory( list, Messages.get(this, "cat_exotic_scroll"), new ArrayList<Class<?>>( ExoticScroll.regToExo.values() ) );
-		addCategory( list, Messages.get(this, "cat_stone"),    Arrays.asList( Generator.Category.STONE.classes ) );
-		addCategory( list, Messages.get(this, "cat_seed"),     Arrays.asList( Generator.Category.SEED.classes ) );
-		addCategory( list, Messages.get(this, "cat_food"),     Arrays.asList( Generator.Category.FOOD.classes ) );
-		addCategory( list, Messages.get(this, "cat_bomb"),     Arrays.asList( Bomb.class, Firebomb.class, FrostBomb.class,
+		addCategory( list, Messages.get(WndDevTools.class, "cat_wand"),     Arrays.asList( Generator.Category.WAND.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_ring"),     Arrays.asList( Generator.Category.RING.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_artifact"), Arrays.asList( Generator.Category.ARTIFACT.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_trinket"),  Arrays.asList( Generator.Category.TRINKET.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_potion"),   Arrays.asList( Generator.Category.POTION.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_exotic_potion"), new ArrayList<Class<?>>( ExoticPotion.regToExo.values() ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_scroll"),   Arrays.asList( Generator.Category.SCROLL.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_exotic_scroll"), new ArrayList<Class<?>>( ExoticScroll.regToExo.values() ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_stone"),    Arrays.asList( Generator.Category.STONE.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_seed"),     Arrays.asList( Generator.Category.SEED.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_food"),     Arrays.asList( Generator.Category.FOOD.classes ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_bomb"),     Arrays.asList( Bomb.class, Firebomb.class, FrostBomb.class,
 				FlashBangBomb.class, HolyBomb.class, Noisemaker.class, RegrowthBomb.class, ShrapnelBomb.class,
 				SmokeBomb.class, WoollyBomb.class, ArcaneBomb.class ) );
-		addCategory( list, Messages.get(this, "cat_openworld"), Arrays.asList( Essence.Sewers.class, Essence.Prison.class,
+		addCategory( list, Messages.get(WndDevTools.class, "cat_openworld"), Arrays.asList( Essence.Sewers.class, Essence.Prison.class,
 				Essence.Caves.class, Essence.City.class, Essence.Halls.class, Tonic.Strength.class, Tonic.Vitality.class,
 				Tonic.Agility.class, Tonic.Skill.class, Tonic.Endurance.class, Tonic.Resilience.class, Canteen.class, Material.Cloth.class, Material.Wood.class,
 				Material.StoneBlock.class, Material.RefinedMetal.class, RecallCharm.class ) );
-		addCategory( list, Messages.get(this, "cat_uniques"), Arrays.asList(
+		addCategory( list, Messages.get(WndDevTools.class, "cat_uniques"), Arrays.asList(
 				com.shatteredpixel.shatteredpixeldungeon.items.quest.GooBlob.class,
 				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.TenguFeather.class,
 				com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard.class,
 				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.BossTrophy.RoyalSeal.class,
 				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.OozeBlade.class, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.TenguTalon.class,
 				com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.PistonHammer.class, com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.RoyalGlaive.class ) );
-		addCategory( list, Messages.get(this, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
-		addCategory( list, Messages.get(this, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
+		addCategory( list, Messages.get(WndDevTools.class, "cat_medical"),  Arrays.asList( Bandage.class, Splint.class, FirstAidKit.class ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_misc"),     Arrays.asList( Ankh.class, Honeypot.class, Torch.class,
 				Stylus.class, ArcaneResin.class ) );
+		addCategory( list, Messages.get(WndDevTools.class, "cat_endgame"), Arrays.asList(
+				com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.HvtGear.CommandersCarbine.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.HvtGear.HexStaff.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.HvtGear.ButcherCleaver.class,
+				com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack.class ) );
+		return list;
 	}
 
-	private void addCategory( ScrollingListPane list, String title, java.util.List<? extends Class<?>> classes ){
-		list.addTitle( title );
+	private static void addCategory( ArrayList<Object[]> list, String title, java.util.List<? extends Class<?>> classes ){
+		list.add( new Object[]{ title, new ArrayList<Class<?>>( classes ) } );
+	}
+
+	private void fillCategory( ScrollingListPane list, java.util.List<Class<?>> classes ){
 		for (final Class<?> c : classes){
 			final Item sample = (Item) Reflection.newInstance( c );
 			if (sample == null) continue;
