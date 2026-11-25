@@ -1296,7 +1296,8 @@ public class Hero extends Char {
 			if (Dungeon.branch != 0) {
 
 				//keys currently do not apply to sub-floors
-				hasKey = false;
+				//EFPD: except the HVT vault key, which opens the vault of its city district
+				hasKey = com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.VaultKey.canOpen( this, door );
 
 			} else if (door == Terrain.LOCKED_DOOR
 					&& Notes.keyCount(new IronKey(Dungeon.depth)) > 0) {
@@ -2467,7 +2468,8 @@ public class Hero extends Char {
 			} else if (Dungeon.level.distance(pos, doorCell) <= 1) {
 				boolean hasKey = true;
 				if (Dungeon.branch != 0){
-					hasKey = false; //keys currently do not work in sub-floors
+					//keys currently do not work in sub-floors (EFPD: but the HVT vault key does)
+					hasKey = com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.VaultKey.open( this, door, doorCell );
 				} else if (door == Terrain.LOCKED_DOOR) {
 					hasKey = Notes.remove(new IronKey(Dungeon.depth));
 					if (hasKey) {

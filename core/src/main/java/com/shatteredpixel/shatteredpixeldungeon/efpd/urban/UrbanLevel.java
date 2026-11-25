@@ -27,6 +27,11 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.guns.AmmoSupplies;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt;
+import com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.HvtBoss;
+import com.shatteredpixel.shatteredpixeldungeon.items.Gold;
+import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.efpd.items.MedicalSupplies;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -55,6 +60,15 @@ public class UrbanLevel extends Level {
 	static final int INDOOR = Terrain.EMPTY_SP;
 
 	public int startCell;
+
+	//EFPD bounty hunt (HVT) mode: the target's hideout and the district vault
+	public int hvtKind = 0;
+	public int hvtSite = 0;
+	public int hvtBossCell = -1;
+	public int hvtVaultDoor = -1;
+	//only needed between build() and createMobs()/createItems()
+	private int[] hvtBossRect = null;
+	private final ArrayList<Integer> vaultCells = new ArrayList<>();
 
 	{
 		viewDistance = 8;
@@ -102,6 +116,9 @@ public class UrbanLevel extends Level {
 	protected boolean build() {
 		setSize( SIZE, SIZE );
 		lootCells.clear();
+		vaultCells.clear();
+		hvtBossCell = hvtVaultDoor = -1;
+		hvtBossRect = null;
 
 		//open ground inside the city wall (rings 0 and 1 stay wall)
 		for (int y = 2; y < SIZE-2; y++){
@@ -151,9 +168,36 @@ public class UrbanLevel extends Level {
 			}
 			if (subway == -1) subway = Random.Int( buildings.size() );
 		}
+		//bounty hunt: the target hides in one of the buildings farthest from the plaza,
+		//and the district vault takes over another building
+		int bossB = -1, vaultB = -1;
+		if (Hvt.isActive() && buildings.size() >= 3){
+			hvtKind = Random.Int( Hvt.KINDS );
+			hvtSite = Random.Int( Hvt.SITES );
+			ArrayList<Integer> order = new ArrayList<>();
+			for (int b = 0; b < buildings.size(); b++) if (b != subway) order.add( b );
+			final int fcx = cx, fcy = cy;
+			java.util.Collections.sort( order, (a, b2) -> Integer.compare(
+					blockDist( buildings.get(b2), fcx, fcy ), blockDist( buildings.get(a), fcx, fcy ) ) );
+			bossB = order.get( Random.Int( Math.min( 3, order.size() ) ) );
+			ArrayList<Integer> rest = new ArrayList<>( order );
+			rest.remove( Integer.valueOf( bossB ) );
+			//not right next to the plaza
+			for (int i = rest.size()-1; i >= 0 && rest.size() > 1; i--){
+				if (blockDist( buildings.get( rest.get(i) ), cx, cy ) < 12) rest.remove( i );
+			}
+			if (!rest.isEmpty()) vaultB = Random.element( rest );
+		}
+
 		for (int b = 0; b < buildings.size(); b++){
 			int[] r = buildings.get(b);
 			int w = r[2]-r[0]+1, h = r[3]-r[1]+1;
+			if (b == vaultB){
+				flat[b*Urban.SPEC_SIZE + Urban.SPEC_W] = w;
+				flat[b*Urban.SPEC_SIZE + Urban.SPEC_H] = h;
+				drawVault( r );
+				continue;
+			}
 			int floors = w*h < 70 ? Random.chances( new float[]{4, 5, 2} )
 			                      : Random.chances( new float[]{2, 4, 3, 1} );
 			boolean basement = b == subway || Random.Float() < 0.3f;
@@ -163,6 +207,12 @@ public class UrbanLevel extends Level {
 			flat[b*Urban.SPEC_SIZE + Urban.SPEC_BASEMENT] = basement ? 1 : 0;
 			flat[b*Urban.SPEC_SIZE + Urban.SPEC_SUBWAY] = b == subway ? 1 : 0;
 			drawBuilding( b, r, floors, basement );
+			if (b == bossB){
+				hvtBossRect = r;
+				hvtBossCell = Rooms.freeCell( map, SIZE, r[0], r[1], r[2], r[3], INDOOR );
+				if (hvtBossCell == -1) hvtBossCell = ((r[0]+r[2])/2) + ((r[1]+r[3])/2)*SIZE;
+				map[hvtBossCell] = INDOOR;
+			}
 		}
 		Urban.recordBuildings( Dungeon.depth, flat );
 
@@ -205,6 +255,31 @@ public class UrbanLevel extends Level {
 			}
 		}
 		return true;
+	}
+
+	private static int blockDist( int[] r, int cx, int cy ){
+		return Math.abs( (r[0]+r[2])/2 - cx ) + Math.abs( (r[1]+r[3])/2 - cy );
+	}
+
+	//the district vault: one sealed hall behind a locked door, opened by the target's vault key
+	private void drawVault( int[] r ){
+		int x0 = r[0], y0 = r[1], x1 = r[2], y1 = r[3];
+		fill( x0, y0, x1, y1, Terrain.WALL );
+		fill( x0+1, y0+1, x1-1, y1-1, INDOOR );
+		int door = Rooms.addOuterDoor( map, SIZE, x0, y0, x1, y1, INDOOR );
+		if (door != -1){
+			map[door] = Terrain.LOCKED_DOOR;
+			hvtVaultDoor = door;
+		}
+		Rooms.furnish( map, SIZE, x0, y0, x1, y1, INDOOR );
+		for (int i = 0; i < 3; i++){
+			int cell = Rooms.freeCell( map, SIZE, x0, y0, x1, y1, INDOOR );
+			if (cell != -1 && !vaultCells.contains( cell )) vaultCells.add( cell );
+		}
+	}
+
+	public boolean vaultLocked(){
+		return hvtVaultDoor >= 0 && map[hvtVaultDoor] == Terrain.LOCKED_DOOR;
 	}
 
 	//war damage on the streets: wrecks, craters and barricades, never closing a road
@@ -366,6 +441,66 @@ public class UrbanLevel extends Level {
 			mob.pos = cell;
 			mobs.add( mob );
 		}
+		if (Hvt.isActive() && hvtBossCell >= 0 && !Hvt.killed( zone() )){
+			placeTarget();
+		}
+	}
+
+	//the target and its escorts, resting in the hideout
+	private void placeTarget(){
+		Mob old = findMob( hvtBossCell );
+		if (old != null) mobs.remove( old );
+		HvtBoss boss = new HvtBoss().setKind( hvtKind );
+		boss.pos = hvtBossCell;
+		mobs.add( boss );
+
+		int escorts = 3 + zone()/2;
+		for (int i = 0; i < escorts; i++){
+			int cell = -1;
+			for (int tries = 0; tries < 40 && cell == -1; tries++){
+				int c;
+				if (hvtBossRect != null && tries < 20){
+					c = Rooms.freeCell( map, SIZE, hvtBossRect[0], hvtBossRect[1], hvtBossRect[2], hvtBossRect[3], INDOOR );
+				} else {
+					c = hvtBossCell + (Random.IntRange( -4, 4 ) + Random.IntRange( -4, 4 )*SIZE);
+				}
+				if (c < 0 || c >= length() || !passable[c] || findMob( c ) != null || isTransitionCell( c )) continue;
+				cell = c;
+			}
+			if (cell == -1) continue;
+			Mob m = Random.Int( 3 ) == 0 ? new Looter() : new Gunman();
+			m.pos = cell;
+			mobs.add( m );
+		}
+	}
+
+	/** After an HVT kill: fresh enemies show up at the gates, and they know where the hero is. */
+	public void spawnReinforcements( int count ){
+		ArrayList<Integer> gates = new ArrayList<>();
+		for (LevelTransition t : transitions){
+			if (t.type == LevelTransition.Type.SURFACE) gates.add( t.centerCell );
+		}
+		if (gates.isEmpty()) return;
+		int heroPos = Dungeon.hero != null ? Dungeon.hero.pos : startCell;
+		for (int i = 0; i < count; i++){
+			int gate = gates.get( i % gates.size() );
+			int cell = -1;
+			for (int tries = 0; tries < 60 && cell == -1; tries++){
+				int c = gate + Random.IntRange( -5, 5 ) + Random.IntRange( -5, 5 )*SIZE;
+				if (c < 0 || c >= length() || !passable[c] || solid[c]) continue;
+				if (Actor.findChar( c ) != null || isTransitionCell( c )) continue;
+				if (distance( c, heroPos ) < 6) continue;
+				cell = c;
+			}
+			if (cell == -1) continue;
+			Mob m = UrbanMobs.create( this );
+			m.pos = cell;
+			m.state = m.WANDERING;
+			GameScene.add( m );
+			//half of them hunt the hero, the rest hold the gate
+			if (i % 2 == 0) m.beckon( heroPos );
+			else m.beckon( gate );
+		}
 	}
 
 	//a random walkable cell at least minDist steps (as the crow flies) from the start
@@ -382,6 +517,11 @@ public class UrbanLevel extends Level {
 
 	@Override
 	protected void createItems() {
+		//the vault's riches
+		for (int i = 0; i < vaultCells.size(); i++){
+			Item item = i == 0 ? new Gold( Random.IntRange( 80, 150 ) * (zone() + 1) ) : CityLoot.rare();
+			if (item != null) drop( item, vaultCells.get(i) ).type = Heap.Type.CHEST;
+		}
 		for (int cell : lootCells){
 			Item item = Generator.random();
 			if (item != null) drop( item, cell );
@@ -450,17 +590,29 @@ public class UrbanLevel extends Level {
 	}
 
 	private static final String START = "efpd_start";
+	private static final String HVT_KIND  = "efpd_hvt_kind";
+	private static final String HVT_SITE  = "efpd_hvt_site";
+	private static final String HVT_BOSS  = "efpd_hvt_boss";
+	private static final String HVT_VAULT = "efpd_hvt_vault";
 
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle( bundle );
 		bundle.put( START, startCell );
+		bundle.put( HVT_KIND, hvtKind );
+		bundle.put( HVT_SITE, hvtSite );
+		bundle.put( HVT_BOSS, hvtBossCell );
+		bundle.put( HVT_VAULT, hvtVaultDoor );
 	}
 
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle( bundle );
 		startCell = bundle.getInt( START );
+		hvtKind = bundle.getInt( HVT_KIND );
+		hvtSite = bundle.getInt( HVT_SITE );
+		hvtBossCell = bundle.contains( HVT_BOSS ) ? bundle.getInt( HVT_BOSS ) : -1;
+		hvtVaultDoor = bundle.contains( HVT_VAULT ) ? bundle.getInt( HVT_VAULT ) : -1;
 	}
 
 

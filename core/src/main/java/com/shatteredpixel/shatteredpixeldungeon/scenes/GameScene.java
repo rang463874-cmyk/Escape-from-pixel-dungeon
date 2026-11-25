@@ -761,8 +761,10 @@ public class GameScene extends PixelScene {
 					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "ow_arrive", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));
 				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive() && com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.canWithdraw()){
 					GLog.p(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "start"));
+					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();
 				} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.consumeZoneArrival()){
 					GLog.w(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "new_zone", com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.zoneIndex(Dungeon.depth)+1));
+					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();
 				}
 			}
 			//EFPD: arriving on a floor that has regrown

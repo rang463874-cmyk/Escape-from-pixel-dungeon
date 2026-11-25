@@ -1,0 +1,82 @@
+/*
+ * Escape from Pixel Dungeon
+ * A hardcore extraction mod of Shattered Pixel Dungeon
+ *
+ * Shattered Pixel Dungeon
+ * Copyright (C) 2014-2025 Evan Debenham
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
+package com.shatteredpixel.shatteredpixeldungeon.efpd.hvt;
+
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
+import com.watabou.noosa.TextureFilm;
+import com.watabou.noosa.audio.Sample;
+import com.watabou.utils.Callback;
+
+/** Warlock target: the dwarf warlock sprite in violet (sprites/efpd_hvt_hexer.png), casting bolts. */
+public class HexerSprite extends HvtSprite {
+
+	public static final String TEXTURE = "sprites/efpd_hvt_hexer.png";
+
+	public HexerSprite() {
+		super();
+		texture( TEXTURE );
+		TextureFilm frames = new TextureFilm( texture, 12, 15 );
+
+		idle = new Animation( 2, true );
+		idle.frames( frames, 0, 0, 0, 1, 0, 0, 1, 1 );
+
+		run = new Animation( 15, true );
+		run.frames( frames, 0, 2, 3, 4 );
+
+		attack = new Animation( 12, false );
+		attack.frames( frames, 0, 5, 6 );
+
+		zap = attack.clone();
+
+		die = new Animation( 15, false );
+		die.frames( frames, 0, 7, 8, 8, 9, 10 );
+
+		play( idle );
+	}
+
+	@Override
+	public void attack( int cell ) {
+		if (!Dungeon.level.adjacent( cell, ch.pos )) {
+			turnTo( ch.pos, cell );
+			play( zap );
+			MagicMissile.boltFromChar( parent, MagicMissile.SHADOW, this, cell, new Callback() {
+				@Override
+				public void call() {
+					ch.onAttackComplete();
+				}
+			} );
+			Sample.INSTANCE.play( Assets.Sounds.ZAP );
+		} else {
+			super.attack( cell );
+		}
+	}
+
+	@Override
+	public void onComplete( Animation anim ) {
+		if (anim == zap) {
+			idle();
+		}
+		super.onComplete( anim );
+	}
+}

@@ -64,7 +64,7 @@ class Rooms {
 	}
 
 	/** Opens a door in the outer wall, where the room inside is walkable. */
-	static void addOuterDoor( int[] map, int W, int x0, int y0, int x1, int y1, int floor ){
+	static int addOuterDoor( int[] map, int W, int x0, int y0, int x1, int y1, int floor ){
 		for (int tries = 0; tries < 30; tries++){
 			int x, y, ix, iy;
 			switch (Random.Int(4)){
@@ -75,9 +75,10 @@ class Rooms {
 			}
 			if (is( map, W, ix, iy, floor ) && is( map, W, x, y, Terrain.WALL )){
 				map[x + y*W] = Terrain.DOOR;
-				return;
+				return x + y*W;
 			}
 		}
+		return -1;
 	}
 
 	private static boolean nearDoor( int[] map, int W, int x, int y ){

@@ -275,6 +275,8 @@ public class Dungeon {
 			Statistics.efpdUrban = true;
 			depth = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.ZONE_DEPTHS[0];
 			branch = com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH;
+			//EFPD: bounty hunt (HVT) runs are urban warfare runs with a target in every district
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.selectedMode) com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.start();
 		}
 		generatedLevels.clear();
 

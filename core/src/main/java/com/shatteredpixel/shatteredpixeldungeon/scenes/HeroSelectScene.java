@@ -161,11 +161,13 @@ public class HeroSelectScene extends PixelScene {
 						Messages.get(OpenWorld.class, "mode_desc"),
 						Messages.get(OpenWorld.class, "mode_extraction"),
 						Messages.get(OpenWorld.class, "mode_openworld"),
-						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "mode_urban") ){
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "mode_urban"),
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.class, "mode_hvt") ){
 					@Override
 					protected void onSelect( int index ) {
 						OpenWorld.selectedMode = index == 1;
-						com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode = index == 2;
+						com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode = index == 2 || index == 3;
+						com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.selectedMode = index == 3;
 
 						Dungeon.hero = null;
 						Dungeon.daily = Dungeon.dailyReplay = false;
@@ -768,6 +770,7 @@ public class HeroSelectScene extends PixelScene {
 								//EFPD: daily runs are always extraction runs
 								OpenWorld.selectedMode = false;
 								com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode = false;
+								com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.selectedMode = false;
 								Dungeon.daily = true;
 								Dungeon.initSeed();
 								ActionIndicator.clearAction();
