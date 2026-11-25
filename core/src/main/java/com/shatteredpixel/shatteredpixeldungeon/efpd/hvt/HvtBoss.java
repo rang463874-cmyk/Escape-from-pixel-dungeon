@@ -385,6 +385,10 @@ public class HvtBoss extends Mob {
 			drops.add( HvtGear.forKind( kind, z ) );
 		}
 		drops.add( CityLoot.rare() );
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.canDrop() && Random.Float() < com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.HVT_BASE * (z + 1)){
+			drops.add( new com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard() );
+			GLog.p( Messages.get( com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.class, "found" ) );
+		}
 		for (Item item : drops){
 			if (item != null) Dungeon.level.drop( item, cell ).sprite.drop();
 		}

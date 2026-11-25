@@ -158,13 +158,21 @@ public class HeroSelectScene extends PixelScene {
 				//EFPD: choose between extraction and open world survival
 				ShatteredPixelDungeon.scene().addToFront( new WndOptions(
 						Messages.get(OpenWorld.class, "mode_title"),
-						Messages.get(OpenWorld.class, "mode_desc"),
+						Messages.get(OpenWorld.class, "mode_desc") + "\n\n" + com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.statusLine(),
 						Messages.get(OpenWorld.class, "mode_extraction"),
 						Messages.get(OpenWorld.class, "mode_openworld"),
 						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "mode_urban"),
-						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.class, "mode_hvt") ){
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.class, "mode_hvt"),
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.class, "mode_lab") ){
 					@Override
 					protected void onSelect( int index ) {
+						//EFPD: the Lab costs a keycard from the stash
+						if (index == 4 && !com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.spendKeycard()){
+							ShatteredPixelDungeon.scene().addToFront( new com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage(
+									Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.class, "no_keycard") ) );
+							return;
+						}
+						com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.selectedMode = index == 4;
 						OpenWorld.selectedMode = index == 1;
 						com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode = index == 2 || index == 3;
 						com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.selectedMode = index == 3;
@@ -771,6 +779,7 @@ public class HeroSelectScene extends PixelScene {
 								OpenWorld.selectedMode = false;
 								com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode = false;
 								com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.selectedMode = false;
+								com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.selectedMode = false;
 								Dungeon.daily = true;
 								Dungeon.initSeed();
 								ActionIndicator.clearAction();

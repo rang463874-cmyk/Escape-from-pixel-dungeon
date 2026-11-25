@@ -896,9 +896,11 @@ public class ItemSpriteSheet {
 	public static final int ROYAL_SEAL    = EFPD_MATERIALS+7;
 	public static final int DOG_TAG       = EFPD_MATERIALS+8;
 	public static final int VAULT_KEY     = EFPD_MATERIALS+9;
+	public static final int KEYCARD       = EFPD_MATERIALS+10;
 	static{
 		assignItemRect(DOG_TAG,   10, 12);
 		assignItemRect(VAULT_KEY, 13, 7);
+		assignItemRect(KEYCARD,   12, 8);
 		assignItemRect(MAT_CLOTH, 10, 9);
 		assignItemRect(MAT_WOOD,  12, 8);
 		assignItemRect(MAT_STONE, 11, 8);

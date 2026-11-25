@@ -123,6 +123,7 @@ public class Statistics {
 		efpdUrban = false;
 		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.reset();
+		com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.reset();
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.reset();
@@ -243,6 +244,7 @@ public class Statistics {
 		bundle.put( EFPD_URBAN, efpdUrban );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.storeInBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.storeInBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.storeInBundle( bundle );
@@ -314,6 +316,7 @@ public class Statistics {
 		efpdUrban = bundle.getBoolean( EFPD_URBAN );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.restoreFromBundle( bundle );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Facilities.restoreFromBundle( bundle );
 		com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.restoreFromBundle( bundle );

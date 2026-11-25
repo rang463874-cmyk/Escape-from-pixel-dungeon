@@ -43,6 +43,10 @@ public class CityLoot {
 
 	public static Item rare(){
 		int z = Urban.zoneIndex( Dungeon.depth );
+		//from district 3 on, a Lab keycard now and then
+		if (z >= 2 && com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.canDrop() && Random.Float() < com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.CITY_CHEST_CHANCE){
+			return new com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard();
+		}
 		Item item;
 		switch (Random.chances( new float[]{ 30, 20, 15, 10, 10, 15 } )){
 			case 0:  item = UrbanMobs.randomGun(); break;

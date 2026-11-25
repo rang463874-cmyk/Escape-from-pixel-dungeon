@@ -270,6 +270,11 @@ public class Dungeon {
 			Statistics.efpdOpenWorld = true;
 			depth = OpenWorld.BASE_DEPTH;
 			branch = OpenWorld.BASE_BRANCH;
+		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.selectedMode){
+			//EFPD: the Lab, the final destination, entered with a keycard
+			com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.start();
+			depth = com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_DEPTH;
+			branch = com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH;
 		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.selectedMode){
 			//EFPD: urban warfare games start in the middle of the first district
 			Statistics.efpdUrban = true;
@@ -304,6 +309,11 @@ public class Dungeon {
 		if (OpenWorld.isActive()) new com.shatteredpixel.shatteredpixeldungeon.efpd.items.Canteen().fill().collect( hero.belongings.backpack );
 		//EFPD: and a supply pack for materials and ammo
 		if (OpenWorld.isActive()) new com.shatteredpixel.shatteredpixeldungeon.efpd.items.SupplyPack().collect( hero.belongings.backpack );
+		//EFPD: Lab operatives are veterans
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.isActive()){
+			hero.lvl = com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.START_LEVEL;
+			hero.updateHT( true );
+		}
 		//EFPD: the starting kit can't be extracted into the stash
 		Stash.markStartingKit( hero );
 	}
@@ -407,6 +417,9 @@ public class Dungeon {
 		} else if (branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH) {
 			//EFPD: urban warfare district
 			level = new com.shatteredpixel.shatteredpixeldungeon.efpd.urban.UrbanLevel();
+		} else if (branch == com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH) {
+			//EFPD: the Lab complex
+			level = new com.shatteredpixel.shatteredpixeldungeon.efpd.lab.LabLevel();
 		} else if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isFloorBranch( branch )) {
 			//EFPD: a floor of a city building
 			level = new com.shatteredpixel.shatteredpixeldungeon.efpd.urban.BuildingLevel();

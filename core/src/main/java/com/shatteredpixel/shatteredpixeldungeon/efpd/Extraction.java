@@ -93,6 +93,8 @@ public class Extraction {
 				}
 			} else {
 				GLog.p( Messages.get(Extraction.class, "boss_exit_open") );
+				//the late bosses may carry a Lab keycard
+				com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.rollForBoss( Dungeon.depth );
 			}
 		}
 	}

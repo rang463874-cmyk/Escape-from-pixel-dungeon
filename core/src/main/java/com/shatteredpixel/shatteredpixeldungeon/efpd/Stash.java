@@ -65,11 +65,14 @@ public class Stash {
 	private static final String ITEMS = "items";
 	private static final String GOLD  = "gold";
 	private static final String ENERGY = "energy";
+	private static final String LAB_CLEARS = "lab_clears";
 
 	public static ArrayList<Item> items = new ArrayList<>();
 	public static int gold = 0;
 	//alchemical energy, only usable at the hideout alchemy station
 	public static int energy = 0;
+	//EFPD: times the hero escaped the Lab, the final destination
+	public static int labClears = 0;
 
 	//quest items and other run-bound items which make no sense in a new run
 	private static final Class<?>[] NOT_STASHABLE = new Class<?>[]{
@@ -87,6 +90,7 @@ public class Stash {
 		items = new ArrayList<>();
 		gold = 0;
 		energy = 0;
+		labClears = 0;
 		try {
 			Bundle bundle = FileUtils.bundleFromFile( STASH_FILE );
 			for (Bundlable b : bundle.getCollection( ITEMS )){
@@ -94,6 +98,7 @@ public class Stash {
 			}
 			gold = bundle.getInt( GOLD );
 			energy = bundle.getInt( ENERGY );
+			labClears = bundle.getInt( LAB_CLEARS );
 			//stashes saved before sorting existed are shown sorted too
 			sort();
 		} catch (IOException e) {
@@ -107,6 +112,7 @@ public class Stash {
 		bundle.put( ITEMS, items );
 		bundle.put( GOLD, gold );
 		bundle.put( ENERGY, energy );
+		bundle.put( LAB_CLEARS, labClears );
 		try {
 			FileUtils.bundleToFile( STASH_FILE, bundle );
 		} catch (IOException e) {
@@ -187,6 +193,8 @@ public class Stash {
 	public static boolean canWithdraw(){
 		//in the hideout withdrawn items go back into the stash when the hero finishes up
 		if (Statistics.efpdInHideout) return true;
+		//the Lab: only in the starting room, before touching anything
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.isActive()) return com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.canWithdraw();
 		//open world: only in the base town
 		if (OpenWorld.isActive()) return OpenWorld.onBase();
 		//urban warfare: only on the starting plaza, before going anywhere

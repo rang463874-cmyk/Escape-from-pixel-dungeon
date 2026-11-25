@@ -630,11 +630,11 @@ public class GameScene extends PixelScene {
 		if (InterlevelScene.mode != InterlevelScene.Mode.NONE) {
 			if (Dungeon.depth == Statistics.deepestFloor
 					&& (InterlevelScene.mode == InterlevelScene.Mode.DESCEND || InterlevelScene.mode == InterlevelScene.Mode.FALL)) {
-				if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
+				if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity() && Dungeon.branch != com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH) GLog.h(Messages.get(this, "descend"), Dungeon.depth);
 				Sample.INSTANCE.play(Assets.Sounds.DESCEND);
 
 				//EFPD: remind the player about the stash at the start of a raid
-				if (!OpenWorld.isActive() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive()
+				if (!OpenWorld.isActive() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.isActive() && !com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.isActive()
 						&& Stash.canWithdraw() && !Stash.isEmpty()){
 					GLog.p(Messages.get(Stash.class, "hint"));
 				}
@@ -667,7 +667,7 @@ public class GameScene extends PixelScene {
 				GLog.h(Messages.get(this, "warp"));
 			} else if (InterlevelScene.mode == InterlevelScene.Mode.RESURRECT) {
 				GLog.h(Messages.get(this, "resurrect"), Dungeon.depth);
-			} else if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity()) {
+			} else if (!OpenWorld.onBase() && !com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity() && Dungeon.branch != com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH) {
 				GLog.h(Messages.get(this, "return"), Dungeon.depth);
 			}
 
@@ -767,6 +767,8 @@ public class GameScene extends PixelScene {
 					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();
 				}
 			}
+			//EFPD: arriving in the Lab
+			com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.onArrive();
 			//EFPD: arriving on a floor that has regrown
 			if (com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.consumeNotice()){
 				GLog.w(Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.Regen.class,

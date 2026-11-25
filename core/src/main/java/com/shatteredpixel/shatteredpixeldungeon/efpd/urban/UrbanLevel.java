@@ -522,6 +522,9 @@ public class UrbanLevel extends Level {
 			Item item = i == 0 ? new Gold( Random.IntRange( 80, 150 ) * (zone() + 1) ) : CityLoot.rare();
 			if (item != null) drop( item, vaultCells.get(i) ).type = Heap.Type.CHEST;
 		}
+		if (!vaultCells.isEmpty() && com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.canDrop() && Random.Float() < com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard.VAULT_CHANCE){
+			drop( new com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Keycard(), vaultCells.get( 0 ) );
+		}
 		for (int cell : lootCells){
 			Item item = Generator.random();
 			if (item != null) drop( item, cell );
