@@ -168,6 +168,8 @@ public class Lab {
 	//shown when the hero arrives
 	public static void onArrive(){
 		showPendingVictory();
+		//out of the Lab (or died in it): its air and alarm are gone right away
+		if (!inLab()) clearLabBuffs( Dungeon.hero );
 		if (!inLab() || Dungeon.hero == null) return;
 		if (Dungeon.hero.buff( Hazard.class ) == null){
 			//the first leak comes a while after arriving
@@ -287,7 +289,15 @@ public class Lab {
 	//open world: the victory message waits until the hero is back in town
 	private static int pendingVictory = 0;
 
+	/** Removes the Lab's air and lockdown from the hero, once they are out of the Lab. */
+	public static void clearLabBuffs( Hero hero ){
+		if (hero == null) return;
+		Buff.detach( hero, Hazard.class );
+		Buff.detach( hero, Lockdown.class );
+	}
+
 	public static void escape( final Hero hero ){
+		clearLabBuffs( hero );
 		if (OpenWorld.isActive()){
 			//open world: back to town with the loot, the run goes on
 			Stash.load();
