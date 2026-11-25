@@ -155,8 +155,31 @@ public class Stash {
 		return SORT_ORDER.length;
 	}
 
-	/** Sorts the stash by category, then by name. Stable, so equal items keep their order. */
+	/** Merges stacks of the same stackable item into one. */
+	public static void mergeStacks(){
+		ArrayList<Item> merged = new ArrayList<>();
+		for (Item item : items){
+			boolean done = false;
+			if (item.stackable){
+				for (Item m : merged){
+					if (m.stackable && m.isSimilar( item )){
+						m.quantity( m.quantity() + item.quantity() );
+						done = true;
+						break;
+					}
+				}
+			}
+			if (!done) merged.add( item );
+		}
+		items = merged;
+	}
+
+	/**
+	 * Merges stacks of the same item, then sorts the stash by category, then by name.
+	 * Stable, so equal items keep their order.
+	 */
 	public static void sort(){
+		mergeStacks();
 		java.util.Collections.sort( items, new java.util.Comparator<Item>() {
 			@Override
 			public int compare( Item a, Item b ) {
