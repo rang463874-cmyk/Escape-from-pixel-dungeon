@@ -754,6 +754,8 @@ public class GameScene extends PixelScene {
 				GLog.p(Messages.get(OpenWorld.class, "at_base"));
 				//EFPD: quest givers who joined move into town
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Allies.populateBase();
+				//EFPD: and the ring sage, once Yog-Dzewa has fallen
+				com.shatteredpixel.shatteredpixeldungeon.efpd.RingSage.populateBase();
 			}
 			//EFPD: urban warfare arrival messages
 			if (com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.inCity() && Dungeon.branch == com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.URBAN_BRANCH){
@@ -767,6 +769,8 @@ public class GameScene extends PixelScene {
 					com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.brief();
 				}
 			}
+			//EFPD: rings bound by the ring sage keep working everywhere
+			com.shatteredpixel.shatteredpixeldungeon.efpd.RingSage.ensureActive();
 			//EFPD: arriving in the Lab
 			com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.onArrive();
 			//EFPD: arriving on a floor that has regrown

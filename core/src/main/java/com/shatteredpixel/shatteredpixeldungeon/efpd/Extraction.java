@@ -86,6 +86,9 @@ public class Extraction {
 				Statistics.efpdBossKills++;
 				//open world: the next region opens on the region map
 				int next = OpenWorld.regionOf(Dungeon.depth) + 1;
+				if (first && Dungeon.depth == RingSage.YOG_DEPTH){
+					RingSage.onYogSlain();
+				}
 				if (first && next < OpenWorld.REGION_START.length){
 					GLog.p( Messages.get(OpenWorld.class, "region_unlocked", Messages.get(OpenWorld.class, "region_" + next)) );
 				} else if (!first){
