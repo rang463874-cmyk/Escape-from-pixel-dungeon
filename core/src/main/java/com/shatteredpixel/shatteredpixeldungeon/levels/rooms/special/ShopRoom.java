@@ -305,6 +305,10 @@ public class ShopRoom extends SpecialRoom {
 		}
 
 		itemsToSpawn.add( new Ankh() );
+		//EFPD: extraction mode shops sell a way straight back to the hideout
+		if (com.shatteredpixel.shatteredpixeldungeon.efpd.items.ExtractionEscort.sold()){
+			itemsToSpawn.add( new com.shatteredpixel.shatteredpixeldungeon.efpd.items.ExtractionEscort() );
+		}
 		itemsToSpawn.add( new StoneOfAugmentation() );
 
 		TimekeepersHourglass hourglass = Dungeon.hero.belongings.getItem(TimekeepersHourglass.class);

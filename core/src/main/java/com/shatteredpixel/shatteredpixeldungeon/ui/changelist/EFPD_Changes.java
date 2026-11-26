@@ -42,6 +42,10 @@ public class EFPD_Changes {
 	public static void addAllChanges( ArrayList<ChangeInfo> c ){
 		ChangeInfo v;
 
+		v = version( c, "v0.17.0" );
+		add( v, new ItemSprite( ItemSpriteSheet.RETURN_BEACON ), "은신처 길잡이",
+				"익스트랙션 모드의 상점(6·11·16층, 20층 임프 상점)에서 은신처 길잡이를 팝니다. 값은 앙크의 두 배입니다.\n\n들고 다닐 수 없는 서비스로, 사는 즉시 가진 것을 모두 들고 은신처로 탈출합니다." );
+
 		v = version( c, "v0.16.5" );
 		add( v, new ItemSprite( ItemSpriteSheet.SPLINT ), "부상 기준 조정",
 				"한 번에 받은 피해로 부상이 생기는 기준을 낮췄습니다.\n\n- 최대 체력의 30% 이상: 바로 중상 (기존 40%)\n- 15% 이상: 확정 경상 (기존 25%)\n- 15% 미만: 6% 확률로 경상 (그대로)" );
