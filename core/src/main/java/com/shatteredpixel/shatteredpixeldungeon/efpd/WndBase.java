@@ -96,6 +96,9 @@ public class WndBase extends Window {
 		addButton( Messages.get(this, "bounties"), new Runnable() { public void run() {
 			hide(); showBounties();
 		}});
+		addButton( Messages.get(Legacy.class, "title"), new Runnable() { public void run() {
+			hide(); Legacy.show();
+		}});
 		addButton( Messages.get(this, "training"), new Runnable() { public void run() {
 			hide(); TownServices.showTraining();
 		}});

@@ -205,6 +205,7 @@ public abstract class Recipe {
 		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewTenguTalon(),
 		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewPistonHammer(),
 		new com.shatteredpixel.shatteredpixeldungeon.efpd.uniques.UniqueWeapon.BrewRoyalGlaive(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.MedicRecipe(), //EFPD: legacy perk recipe
 		new UnstableBrew.Recipe(),
 		new CausticBrew.Recipe(),
 		new ElixirOfArcaneArmor.Recipe(),
@@ -222,6 +223,7 @@ public abstract class Recipe {
 		new Potion.SeedToPotion(),
 		new StewedMeat.threeMeat(),
 		new MeatPie.Recipe(),
+		new com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.ForgeKeycard(), //EFPD: legacy perk recipe
 		new com.shatteredpixel.shatteredpixeldungeon.efpd.items.Tonic.Brew() //EFPD: permanent tonics
 	};
 	

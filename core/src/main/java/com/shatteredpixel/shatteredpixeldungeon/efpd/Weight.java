@@ -134,7 +134,7 @@ public class Weight {
 	}
 
 	public static float of( Item item ){
-		return unitWeight(item) * Math.max(1, item.quantity());
+		return unitWeight(item) * Legacy.weightMulti(item) * Math.max(1, item.quantity());
 	}
 
 	public static float carried( Hero hero ){
@@ -147,7 +147,7 @@ public class Weight {
 	}
 
 	public static float capacity( Hero hero ){
-		return CAPACITY_BASE + CAPACITY_PER_STR * hero.STR() + SupplyPack.bonusFor( hero );
+		return CAPACITY_BASE + CAPACITY_PER_STR * hero.STR() + SupplyPack.bonusFor( hero ) + Legacy.carryBonus();
 	}
 
 	public static int level( Hero hero ){

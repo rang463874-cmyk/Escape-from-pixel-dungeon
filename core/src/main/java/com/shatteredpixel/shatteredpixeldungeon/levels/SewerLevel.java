@@ -175,6 +175,7 @@ public class SewerLevel extends RegularLevel {
 						Dungeon.win( Amulet.class );
 						//EFPD: escaping with the amulet is the ultimate extraction
 						Stash.depositAll( hero );
+						com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.award( "reason_amulet" );
 						Dungeon.deleteGame( GamesInProgress.curSlot, true );
 						Badges.saveGlobal();
 					}

@@ -83,6 +83,12 @@ public class WndHideout extends Window {
 				ShatteredPixelDungeon.switchScene( AlchemyScene.class );
 			}
 		});
+		pos = addButton( Messages.get(Legacy.class, "title"), width, pos, new Runnable() {
+			public void run() {
+				hide();
+				Legacy.show();
+			}
+		});
 		pos = addButton( Messages.get(this, "stash"), width, pos, new Runnable() {
 			public void run() {
 				hide();

@@ -271,6 +271,8 @@ public class Hero extends Char {
 		HT = Math.round(multiplier * HT);
 		//EFPD: open world vitality
 		HT += PermStats.htBonus();
+		//EFPD: legacy perks
+		HT += com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.htBonus();
 		
 		if (buff(ElixirOfMight.HTBoost.class) != null){
 			HT += buff(ElixirOfMight.HTBoost.class).boost();
@@ -288,6 +290,8 @@ public class Hero extends Char {
 		strBonus += RingOfMight.strengthBonus( this );
 		//EFPD: open world strength
 		strBonus += PermStats.strBonus();
+		//EFPD: legacy perks
+		strBonus += com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.strBonus();
 		
 		AdrenalineSurge buff = buff(AdrenalineSurge.class);
 		if (buff != null){

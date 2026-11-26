@@ -155,6 +155,7 @@ public class OpenWorld {
 				hero.belongings.getItem( com.shatteredpixel.shatteredpixeldungeon.items.Amulet.class );
 		if (amulet != null) Stash.depositOne( hero, amulet );
 		liftAmuletCurse( hero );
+		Legacy.award( "reason_amulet" );
 		com.shatteredpixel.shatteredpixeldungeon.Badges.validateHappyEnd();
 		com.shatteredpixel.shatteredpixeldungeon.Badges.saveGlobal();
 		pendingSurvival = true;

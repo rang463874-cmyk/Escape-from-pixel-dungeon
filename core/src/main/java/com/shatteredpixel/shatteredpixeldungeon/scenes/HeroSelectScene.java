@@ -163,9 +163,15 @@ public class HeroSelectScene extends PixelScene {
 						Messages.get(OpenWorld.class, "mode_openworld"),
 						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.urban.Urban.class, "mode_urban"),
 						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.hvt.Hvt.class, "mode_hvt"),
-						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.class, "mode_lab") ){
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.class, "mode_lab"),
+						Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.class, "title") ){
 					@Override
 					protected void onSelect( int index ) {
+						//EFPD: legacy perks, no game starts
+						if (index == 5){
+							com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.show();
+							return;
+						}
 						//EFPD: the Lab costs a keycard from the stash
 						if (index == 4 && !com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.spendKeycard()){
 							ShatteredPixelDungeon.scene().addToFront( new com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage(

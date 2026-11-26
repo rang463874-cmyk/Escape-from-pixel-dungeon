@@ -78,7 +78,17 @@ public class AmuletScene extends PixelScene {
 		btnExit = new StyledButton(Chrome.Type.GREY_BUTTON_TR, Messages.get(this, "exit") ) {
 			@Override
 			protected void onClick() {
+				//EFPD: open world runs go on after the ending
+				if (com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.isActive()){
+					btnExit.enable(false);
+					btnStay.enable(false);
+					com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.escapeWithAmulet( Dungeon.hero );
+					return;
+				}
 				Dungeon.win( Amulet.class );
+				//EFPD: ending with the amulet is the ultimate extraction: everything goes into the stash
+				com.shatteredpixel.shatteredpixeldungeon.efpd.Stash.depositAll( Dungeon.hero );
+				com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.award( "reason_amulet" );
 				Dungeon.deleteGame( GamesInProgress.curSlot, true );
 				Badges.saveGlobal();
 				btnExit.enable(false);

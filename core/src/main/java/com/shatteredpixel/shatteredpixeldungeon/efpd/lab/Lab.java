@@ -298,6 +298,7 @@ public class Lab {
 
 	public static void escape( final Hero hero ){
 		clearLabBuffs( hero );
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.award( "reason_lab" );
 		if (OpenWorld.isActive()){
 			//open world: back to town with the loot, the run goes on
 			Stash.load();
