@@ -209,6 +209,8 @@
 - 새 버전 만들기: `build.gradle`의 `appVersionCode`·`appVersionName`과 `docs/release-notes.md`(맨 아래 `internal version number` 포함)를 고쳐서 푸시하면, GitHub Actions(`.github/workflows/android-release.yml`)가 `v<appVersionName>` 릴리즈를 만들어 APK를 올립니다. Actions 탭에서 수동으로 실행할 수도 있습니다. 게임 안의 업데이트 알림도 이 릴리즈를 봅니다.
 - 서명: 저장소 시크릿 `EFPD_KEYSTORE_B64`(키스토어 base64), `EFPD_KEYSTORE_PASSWORD`, `EFPD_KEY_ALIAS`, `EFPD_KEY_PASSWORD`가 있으면 그 키로 서명합니다. 없으면 저장소에 들어 있는 `android/efpd-debug.keystore`(비밀번호가 공개된 디버그용 키)로 서명합니다. 서명 키를 바꾸면 기존 앱 위에 업데이트할 수 없어 삭제 후 재설치(세이브 삭제)가 필요하니, 개인 키는 정식 배포 전에 정하는 것이 좋습니다.
 
+- 업데이트 내역: 게임 안 "변경사항" 화면의 첫 탭(Escape from PD)은 `ui/changelist/EFPD_Changes.java`에서 버전별로 관리합니다. 새 버전을 릴리즈할 때마다 맨 위에 섹션을 추가합니다(`docs/release-notes.md`와 함께).
+
 ## 로드맵
 
 - [x] 은신처 창고 + 1층 탈출

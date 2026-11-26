@@ -63,7 +63,9 @@ import java.util.ArrayList;
 
 public class ChangesScene extends PixelScene {
 	
-	public static int changesSelected = 0;
+	//EFPD: the mod's own history is tab 9, opened first
+	public static final int EFPD_TAB = 9;
+	public static int changesSelected = EFPD_TAB;
 
 	private NinePatch rightPanel;
 	private ScrollPane rightScroll;
@@ -150,13 +152,16 @@ public class ChangesScene extends PixelScene {
 		
 		final ArrayList<ChangeInfo> changeInfos = new ArrayList<>();
 
-		if (Messages.lang() != Languages.ENGLISH){
+		if (Messages.lang() != Languages.ENGLISH && changesSelected != EFPD_TAB){
 			ChangeInfo langWarn = new ChangeInfo("", true, Messages.get(this, "lang_warn"));
 			langWarn.hardlight(CharSprite.WARNING);
 			changeInfos.add(langWarn);
 		}
 		
 		switch (changesSelected){
+			case EFPD_TAB:
+				com.shatteredpixel.shatteredpixeldungeon.ui.changelist.EFPD_Changes.addAllChanges(changeInfos);
+				break;
 			case 0: default:
 				v4_X_Changes.addAllChanges(changeInfos);
 				break;
@@ -245,13 +250,19 @@ public class ChangesScene extends PixelScene {
 
 		float left = list.left()-4f;
 
-		if (changesSelected <= 3){
+		if (changesSelected == EFPD_TAB){
 
-			left = setupChangesSelectionButton(0, "v4.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(1, "v3.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(2, "v2.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(3, "v1.X", left, list.bottom(), 24);
-			left = setupChangesSelectionButton(4, "PreRelease->", left, list.bottom(), 53);
+			left = setupChangesSelectionButton(EFPD_TAB, "Escape from PD", left, list.bottom(), 70);
+			left = setupChangesSelectionButton(0, "Shattered->", left, list.bottom(), 50);
+
+		} else if (changesSelected <= 3){
+
+			left = setupChangesSelectionButton(EFPD_TAB, "<-EFPD", left, list.bottom(), 30);
+			left = setupChangesSelectionButton(0, "v4.X", left, list.bottom(), 22);
+			left = setupChangesSelectionButton(1, "v3.X", left, list.bottom(), 22);
+			left = setupChangesSelectionButton(2, "v2.X", left, list.bottom(), 22);
+			left = setupChangesSelectionButton(3, "v1.X", left, list.bottom(), 22);
+			left = setupChangesSelectionButton(4, "Pre->", left, list.bottom(), 28);
 
 		} else {
 

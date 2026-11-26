@@ -409,20 +409,41 @@ public class TitleScene extends PixelScene {
 				text(Messages.get(TitleScene.class, "update"));
 			}
 
-			if (updateShown){
+			//EFPD: only blinks until this update has been looked at once
+			if (updateShown && !updateSeen()){
 				textColor(ColorMath.interpolate( 0xFFFFFF, Window.SHPX_COLOR, 0.5f + (float)Math.sin(Game.timeTotal*5)/2f));
+			} else if (updateShown){
+				textColor(Window.SHPX_COLOR);
 			}
+		}
+
+		private static final String SEEN_KEY = "efpd_update_seen";
+
+		private static boolean updateSeen(){
+			AvailableUpdateData u = Updates.updateData();
+			return u != null && SPDSettings.getInt( SEEN_KEY, 0 ) >= u.versionCode;
+		}
+
+		//the release notes list every version: show only the newest section
+		private static String latestNotes( String desc ){
+			if (desc == null) return null;
+			int start = desc.indexOf( "**" );
+			if (start < 0) return desc;
+			int next = desc.indexOf( "\n**", desc.indexOf( "**", start + 2 ) + 2 );
+			String s = next > 0 ? desc.substring( start, next ) : desc.substring( start );
+			return s.replace( "**", "_" ).trim();
 		}
 
 		@Override
 		protected void onClick() {
 			if (Updates.updateAvailable()){
 				AvailableUpdateData update = Updates.updateData();
+				SPDSettings.put( SEEN_KEY, update.versionCode );
 
 				ShatteredPixelDungeon.scene().addToFront( new WndOptions(
 						Icons.get(Icons.CHANGES),
 						update.versionName == null ? Messages.get(this,"title") : Messages.get(this,"versioned_title", update.versionName),
-						update.desc == null ? Messages.get(this,"desc") : update.desc,
+						update.desc == null ? Messages.get(this,"desc") : latestNotes(update.desc),
 						Messages.get(this,"update"),
 						Messages.get(this,"changes")
 				) {
@@ -431,14 +452,14 @@ public class TitleScene extends PixelScene {
 						if (index == 0) {
 							Updates.launchUpdate(Updates.updateData());
 						} else if (index == 1){
-							ChangesScene.changesSelected = 0;
+							ChangesScene.changesSelected = ChangesScene.EFPD_TAB;
 							ShatteredPixelDungeon.switchNoFade( ChangesScene.class );
 						}
 					}
 				});
 
 			} else {
-				ChangesScene.changesSelected = 0;
+				ChangesScene.changesSelected = ChangesScene.EFPD_TAB;
 				ShatteredPixelDungeon.switchNoFade( ChangesScene.class );
 			}
 		}
