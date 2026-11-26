@@ -55,9 +55,9 @@ public class Injuries extends Buff {
 	//chance for any damaging enemy hit to cause an injury
 	public static final float BASE_CHANCE = 0.06f;
 	//a single hit of at least this fraction of max HP always injures...
-	public static final float BIG_HIT     = 0.25f;
+	public static final float BIG_HIT     = 0.15f;
 	//...and a hit of at least this fraction causes a severe injury right away
-	public static final float HUGE_HIT    = 0.40f;
+	public static final float HUGE_HIT    = 0.30f;
 
 	//chance that a new injury also starts bleeding, by resulting severity
 	public static final float[] BLEED_CHANCE = { 0f, 0.30f, 0.70f };

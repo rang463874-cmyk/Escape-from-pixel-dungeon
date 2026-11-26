@@ -42,6 +42,10 @@ public class EFPD_Changes {
 	public static void addAllChanges( ArrayList<ChangeInfo> c ){
 		ChangeInfo v;
 
+		v = version( c, "v0.16.5" );
+		add( v, new ItemSprite( ItemSpriteSheet.SPLINT ), "부상 기준 조정",
+				"한 번에 받은 피해로 부상이 생기는 기준을 낮췄습니다.\n\n- 최대 체력의 30% 이상: 바로 중상 (기존 40%)\n- 15% 이상: 확정 경상 (기존 25%)\n- 15% 미만: 6% 확률로 경상 (그대로)" );
+
 		v = version( c, "v0.16.4" );
 		add( v, Icons.CHANGES.get(), "업데이트 내역 개편",
 				"업데이트 내역을 원작처럼 버전별 아이콘으로 바꿨습니다. 아이콘을 누르면 설명이 나옵니다. 원작의 변경사항은 아래 \"Shattered->\" 탭에 있습니다.\n\n업데이트 알림 창에는 최신 버전의 내용만 나오고, 업데이트 버튼은 한 번 확인하면 더 이상 깜빡이지 않습니다." );
