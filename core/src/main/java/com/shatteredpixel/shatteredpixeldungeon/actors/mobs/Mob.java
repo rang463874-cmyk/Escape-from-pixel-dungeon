@@ -141,16 +141,24 @@ public abstract class Mob extends Char {
 	protected static final float TIME_TO_WAKE_UP = 1f;
 
 	protected boolean firstAdded = true;
+	//EFPD: damage multiplier from the dungeon region the mob first appeared in
+	public float efpdDmgMulti = 1f;
 	protected void onAdd(){
 		if (firstAdded) {
 			//modify health for ascension challenge if applicable, only on first add
 			float percent = HP / (float) HT;
 			HT = Math.round(HT * AscensionChallenge.statModifier(this));
+			//EFPD: deeper dungeon regions make enemies tougher (HP and damage)
+			efpdDmgMulti = com.shatteredpixel.shatteredpixeldungeon.efpd.RegionScaling.multiplierFor(this);
+			if (com.shatteredpixel.shatteredpixeldungeon.efpd.RegionScaling.scalesHP(this)){
+				HT = Math.max(1, Math.round(HT * efpdDmgMulti));
+			}
 			HP = Math.round(HT * percent);
 			firstAdded = false;
 		}
 	}
 
+	private static final String EFPD_DMG = "efpd_dmg_multi";
 	private static final String STATE	= "state";
 	private static final String SEEN	= "seen";
 	private static final String TARGET	= "target";
@@ -185,6 +193,7 @@ public abstract class Mob extends Char {
 			bundle.put( STATE, Passive.TAG );
 		}
 		bundle.put( SEEN, enemySeen );
+		bundle.put( EFPD_DMG, efpdDmgMulti );
 		bundle.put( TARGET, target );
 		bundle.put( MAX_LVL, maxLvl );
 
@@ -235,6 +244,7 @@ public abstract class Mob extends Char {
 		}
 
 		enemySeen = bundle.getBoolean( SEEN );
+		efpdDmgMulti = bundle.contains( EFPD_DMG ) ? bundle.getFloat( EFPD_DMG ) : 1f;
 
 		target = bundle.getInt( TARGET );
 

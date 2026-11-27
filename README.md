@@ -83,6 +83,10 @@
 
 모드 코드는 `core/src/main/java/com/shatteredpixel/shatteredpixeldungeon/efpd/`에 있고, 원본 파일을 고친 곳에는 `//EFPD:` 주석을 달았습니다.
 
+## 계층별 적 강화
+
+던전의 깊은 계층일수록 적의 최대 체력과 공격력이 늘어납니다(`efpd/RegionScaling.java`, 모든 모드의 던전 층). 하수도 1.0배, 감옥 1.3배, 동굴 1.6배, 도시 1.9배, 지옥 2.2배. 보스 포함(요그 드제바 본체 체력 제외). 폐허 도시와 연구소는 제외.
+
 ## 부상·출혈
 
 - 적에게 맞으면 적마다 정해진 신체 부위에 부상을 입습니다 (`efpd/InjuryTable.java`).

@@ -415,6 +415,11 @@ public abstract class Char extends Actor {
 				dmg = damageRoll();
 			}
 
+			//EFPD: region scaling for enemies
+			if (this instanceof com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob){
+				dmg *= ((com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob) this).efpdDmgMulti;
+			}
+
 			dmg = dmg*dmgMulti;
 
 			//flat damage bonus is affected by multipliers
