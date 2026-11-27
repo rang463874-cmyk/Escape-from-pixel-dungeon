@@ -77,18 +77,8 @@ public class WndBase extends Window {
 		addButton( Messages.get(this, "stash"), new Runnable() { public void run() {
 			hide(); GameScene.show( new WndStash() );
 		}});
-		addButton( Messages.get(this, "deposit"), new Runnable() { public void run() {
-			hide(); selectDeposit();
-		}});
-		addButton( Messages.get(this, "deposit_gold"), new Runnable() { public void run() {
-			hide();
-			if (Dungeon.gold <= 0){
-				GLog.w( Messages.get(WndBase.class, "no_gold") );
-				return;
-			}
-			int amount = Dungeon.gold;
-			Stash.depositGold();
-			GLog.p( Messages.get(WndBase.class, "gold_stored", amount) );
+		addButton( Messages.get(this, "deposit_menu"), new Runnable() { public void run() {
+			hide(); showDepositMenu();
 		}});
 		addButton( Messages.get(this, "market"), new Runnable() { public void run() {
 			hide(); showMarketMenu();
@@ -116,6 +106,33 @@ public class WndBase extends Window {
 		}});
 
 		resize( width, (int)pos );
+	}
+
+	//storing things: items one by one, or an amount of gold
+	public static void showDepositMenu(){
+		WndFacilities.Builder b = new WndFacilities.Builder();
+		b.add( Messages.get(WndBase.class, "deposit"), true, new Runnable() { public void run() {
+			selectDeposit();
+		}});
+		b.add( Messages.get(WndBase.class, "deposit_gold"), Dungeon.gold > 0, new Runnable() { public void run() {
+			GameScene.show( new WndAmount( Messages.get(WndBase.class, "deposit_gold"),
+					Messages.get(WndStash.class, "unit_gold"), Dungeon.gold, Dungeon.gold, new WndAmount.Listener() {
+				@Override
+				public void onAmount( int amount ) {
+					amount = Math.min( amount, Dungeon.gold );
+					if (amount <= 0) return;
+					Stash.load();
+					Stash.gold += amount;
+					Dungeon.gold -= amount;
+					Stash.save();
+					com.shatteredpixel.shatteredpixeldungeon.items.Item.updateQuickslot();
+					OpenWorld.saveRun();
+					GLog.p( Messages.get(WndBase.class, "gold_stored", amount) );
+				}
+			} ) );
+		}});
+		b.add( Messages.get(TownServices.class, "back"), true, new Runnable() { public void run() {} } );
+		b.show( Messages.get(WndBase.class, "deposit_menu"), Messages.get(WndBase.class, "info", Dungeon.gold, Stash.gold, Stash.items.size()) );
 	}
 
 	//the bounty board: one HVT contract at a time, in an unlocked city district

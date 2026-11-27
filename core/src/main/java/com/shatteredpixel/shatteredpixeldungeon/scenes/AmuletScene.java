@@ -78,15 +78,20 @@ public class AmuletScene extends PixelScene {
 		btnExit = new StyledButton(Chrome.Type.GREY_BUTTON_TR, Messages.get(this, "exit") ) {
 			@Override
 			protected void onClick() {
-				//EFPD: open world runs go on after the ending
+				//EFPD: open world: the amulet has to be carried out through the first floor
 				if (com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.isActive()){
+					com.shatteredpixel.shatteredpixeldungeon.utils.GLog.w(
+							Messages.get(com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.class, "amulet_carry_out") );
+					onBackPressed();
 					btnExit.enable(false);
 					btnStay.enable(false);
-					com.shatteredpixel.shatteredpixeldungeon.efpd.OpenWorld.escapeWithAmulet( Dungeon.hero );
 					return;
 				}
 				Dungeon.win( Amulet.class );
-				//EFPD: ending with the amulet is the ultimate extraction: everything goes into the stash
+				//EFPD: the items go into the stash, but the amulet itself is only kept
+				//when it is carried out through the first floor
+				Amulet carried = Dungeon.hero.belongings.getItem( Amulet.class );
+				if (carried != null) carried.detachAll( Dungeon.hero.belongings.backpack );
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Stash.depositAll( Dungeon.hero );
 				com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.award( "reason_amulet" );
 				Dungeon.deleteGame( GamesInProgress.curSlot, true );

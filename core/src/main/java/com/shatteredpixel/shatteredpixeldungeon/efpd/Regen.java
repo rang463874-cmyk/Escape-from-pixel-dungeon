@@ -74,6 +74,16 @@ public class Regen {
 		Dungeon.generatedLevels.remove( Integer.valueOf( com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_DEPTH + 1000*com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.LAB_BRANCH ) );
 	}
 
+	/** Rebuilds a dungeon floor on the next visit. False if the hero's remains are there. */
+	public static boolean forceFloorRegen( int depth ){
+		if (depth < 1 || depth >= SIZE) return false;
+		if (Statistics.efpdCorpseDepth == depth && Statistics.efpdCorpseBranch == 0) return false;
+		generation[depth]++;
+		lastVisit[depth] = 0;
+		Dungeon.generatedLevels.remove( Integer.valueOf( depth ) );
+		return true;
+	}
+
 	public static boolean cityHeldByCorpseAt( int depth ){
 		return cityHeldByCorpse( depth );
 	}

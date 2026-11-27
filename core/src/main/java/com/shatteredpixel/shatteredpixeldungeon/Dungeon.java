@@ -314,6 +314,8 @@ public class Dungeon {
 			hero.lvl = com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.START_LEVEL;
 			hero.updateHT( true );
 		}
+		//EFPD: legacy perk: extra starting supplies (part of the starting kit)
+		com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.giveStartingSupplies( hero );
 		//EFPD: the starting kit can't be extracted into the stash
 		Stash.markStartingKit( hero );
 	}

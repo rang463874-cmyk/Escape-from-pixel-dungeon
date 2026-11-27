@@ -137,6 +137,12 @@ public class Lab {
 				&& com.shatteredpixel.shatteredpixeldungeon.Statistics.efpdCorpseBranch == LAB_BRANCH;
 	}
 
+	/** Open world: enters without a keycard (the dimensional gate's daily pass). */
+	public static void enterFree(){
+		if (!corpseInLab()) Regen.forceLabRegen();
+		OpenWorld.travelTo( LAB_DEPTH, LAB_BRANCH );
+	}
+
 	/** Open world: spends a keycard (carried first) and goes to the Lab, built anew unless the hero's remains are there. */
 	public static boolean enterFromOpenWorld(){
 		boolean paid = false;

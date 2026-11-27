@@ -167,7 +167,7 @@ public class Injuries extends Buff {
 		}
 
 		//open world resilience can shrug off an injury
-		if (Random.Float() < PermStats.injuryAvoidChance()) return;
+		if (Random.Float() < PermStats.injuryAvoidChance() + Legacy.injuryAvoid()) return;
 
 		Part part = InjuryTable.partFor( enemy );
 		Injuries injuries = Buff.affect( hero, Injuries.class );

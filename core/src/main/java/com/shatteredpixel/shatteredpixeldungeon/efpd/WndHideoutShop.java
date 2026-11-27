@@ -88,7 +88,7 @@ public class WndHideoutShop extends WndOptions {
 			int i = shown[n];
 			String name = Messages.titleCase(make(i).name());
 			if (QUANTITY[i] > 1) name += " x" + QUANTITY[i];
-			labels[n] = Messages.get(WndHideoutShop.class, "entry", name, PRICES[i]);
+			labels[n] = Messages.get(WndHideoutShop.class, "entry", name, price(i));
 		}
 		labels[shown.length] = Messages.get(WndHideoutShop.class, "back");
 		return labels;
@@ -101,6 +101,11 @@ public class WndHideoutShop extends WndOptions {
 
 	static int gold(){
 		return townPays() ? Facilities.haveGold() : Dungeon.gold;
+	}
+
+	//legacy perk: bargainer
+	static int price( int i ){
+		return Math.max( 1, Math.round( PRICES[i] * Legacy.priceMulti() ) );
 	}
 
 	static boolean pay( int amount ){
@@ -120,7 +125,7 @@ public class WndHideoutShop extends WndOptions {
 
 	@Override
 	protected boolean enabled( int index ) {
-		return index >= shown.length || gold() >= PRICES[shown[index]];
+		return index >= shown.length || gold() >= price(shown[index]);
 	}
 
 	@Override
@@ -135,7 +140,7 @@ public class WndHideoutShop extends WndOptions {
 
 	@Override
 	protected void onSelect( int index ) {
-		if (index >= shown.length || !pay( PRICES[shown[index]] )) return;
+		if (index >= shown.length || !pay( price(shown[index]) )) return;
 
 		Item item = make(shown[index]);
 		if (!item.collect()){

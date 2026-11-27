@@ -63,16 +63,35 @@ public class Legacy {
 		LIGHT_GEAR( 2 ), //weapons and armor weigh GEAR_LIGHTEN less per level
 		BANDOLIER ( 1 ), //ammo weighs half
 		FIELD_MEDIC( 1 ),//recipe: bandage + splint -> first aid kit
-		FORGER    ( 1 ); //recipe: 3 dog tags -> Lab keycard
+		FORGER    ( 1 ), //recipe: 3 dog tags -> Lab keycard
+		TOUGH_SKIN( 2 ), //INJURY_AVOID chance per level to shrug off an injury
+		AGILE     ( 2 ), //+EVA_PER evasion per level
+		MARKSMAN  ( 2 ), //+ACC_PER accuracy per level
+		LIGHT_EATER( 2 ),//HUNGER_PER less hunger per level
+		SUPPLIES  ( 2 ), //extra medical supplies in the starting kit
+		BARGAINER ( 1 ); //shop prices BARGAIN lower
 
 		public final int max;
 		Perk( int max ){ this.max = max; }
 	}
 
+	//groups for the perk list
+	private static final Perk[][] GROUPS = {
+			{ Perk.VITALITY, Perk.STRENGTH, Perk.AGILE, Perk.MARKSMAN, Perk.TOUGH_SKIN },
+			{ Perk.PORTER, Perk.LIGHT_GEAR, Perk.BANDOLIER },
+			{ Perk.LIGHT_EATER, Perk.SUPPLIES, Perk.BARGAINER },
+			{ Perk.FIELD_MEDIC, Perk.FORGER }
+	};
+
 	public static final int   HP_PER       = 5;
 	public static final float CARRY_PER    = 4f;
 	public static final float GEAR_LIGHTEN = 0.15f;
 	public static final float AMMO_MULTI   = 0.5f;
+	public static final float INJURY_AVOID = 0.10f;
+	public static final float EVA_PER      = 0.05f;
+	public static final float ACC_PER      = 0.05f;
+	public static final float HUNGER_PER   = 0.10f;
+	public static final float BARGAIN      = 0.10f;
 
 	public static final String FILE = "legacy.dat";
 
@@ -80,6 +99,8 @@ public class Legacy {
 	private static int points = 0;
 	private static int earned = 0;
 	private static int[] levels = new int[Perk.values().length];
+	//the altar of legacy (an open world Yendor building) raises every perk's cap by one
+	private static boolean altar = false;
 
 	private static void ensureLoaded(){
 		if (loaded) return;
@@ -90,6 +111,7 @@ public class Legacy {
 			earned = b.getInt( "earned" );
 			int[] l = b.getIntArray( "levels" );
 			if (l != null) System.arraycopy( l, 0, levels, 0, Math.min( l.length, levels.length ) );
+			altar = b.getBoolean( "altar" );
 		} catch (IOException e){
 			//no legacy yet
 		}
@@ -100,6 +122,7 @@ public class Legacy {
 		b.put( "points", points );
 		b.put( "earned", earned );
 		b.put( "levels", levels );
+		b.put( "altar", altar );
 		try {
 			FileUtils.bundleToFile( FILE, b );
 		} catch (IOException e){
@@ -110,6 +133,22 @@ public class Legacy {
 	public static int points(){ ensureLoaded(); return points; }
 	public static int level( Perk p ){ ensureLoaded(); return levels[p.ordinal()]; }
 	public static boolean has( Perk p ){ return level( p ) > 0; }
+	public static int maxFor( Perk p ){ ensureLoaded(); return p.max + (altar ? 1 : 0); }
+	public static boolean altarBuilt(){ ensureLoaded(); return altar; }
+
+	public static void buildAltar(){
+		ensureLoaded();
+		altar = true;
+		save();
+	}
+
+	/** Extra points, e.g. from amulets offered at the altar. */
+	public static void addPoints( int n ){
+		ensureLoaded();
+		points += n;
+		earned += n;
+		save();
+	}
 
 	/** An ending was reached: one more legacy point. */
 	public static void award( String reasonKey ){
@@ -126,7 +165,7 @@ public class Legacy {
 
 	private static boolean buy( Perk p ){
 		ensureLoaded();
-		if (points <= 0 || levels[p.ordinal()] >= p.max) return false;
+		if (points <= 0 || levels[p.ordinal()] >= maxFor( p )) return false;
 		points--;
 		levels[p.ordinal()]++;
 		save();
@@ -140,6 +179,24 @@ public class Legacy {
 	public static int htBonus(){ return level( Perk.VITALITY ) * HP_PER; }
 	public static int strBonus(){ return level( Perk.STRENGTH ); }
 	public static float carryBonus(){ return level( Perk.PORTER ) * CARRY_PER; }
+
+	public static float injuryAvoid(){ return level( Perk.TOUGH_SKIN ) * INJURY_AVOID; }
+	public static float evasionMulti(){ return 1f + level( Perk.AGILE ) * EVA_PER; }
+	public static float accuracyMulti(){ return 1f + level( Perk.MARKSMAN ) * ACC_PER; }
+	public static float hungerMulti(){ return 1f - level( Perk.LIGHT_EATER ) * HUNGER_PER; }
+	public static float priceMulti(){ return 1f - level( Perk.BARGAINER ) * BARGAIN; }
+
+	/** Extra starting supplies, added before the starting kit is marked (so they never reach the stash). */
+	public static void giveStartingSupplies( com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero hero ){
+		int lvl = level( Perk.SUPPLIES );
+		if (lvl >= 1){
+			new Bandage().quantity( 2 ).collect( hero.belongings.backpack );
+			new Splint().collect( hero.belongings.backpack );
+		}
+		if (lvl >= 2){
+			new FirstAidKit().collect( hero.belongings.backpack );
+		}
+	}
 
 	public static float weightMulti( Item item ){
 		if (item instanceof Ammo) return has( Perk.BANDOLIER ) ? AMMO_MULTI : 1f;
@@ -193,36 +250,58 @@ public class Legacy {
 		} );
 	}
 
-	private static class Wnd extends WndOptions {
-		private static Perk[] perks = Perk.values();
+	private static class Wnd extends com.shatteredpixel.shatteredpixeldungeon.ui.Window {
 
 		Wnd(){
-			super( Messages.get( Legacy.class, "title" ),
-					Messages.get( Legacy.class, "desc", points(), earned ), labels() );
-		}
+			super();
+			int width = com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene.landscape() ? 180 : 125;
+			int height = (int)Math.min( 190, com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene.uiCamera.height - 20 );
+			resize( width, height );
 
-		private static String[] labels(){
-			String[] l = new String[perks.length + 1];
-			for (int i = 0; i < perks.length; i++){
-				Perk p = perks[i];
-				l[i] = Messages.get( Legacy.class, "entry", name( p ), level( p ), p.max );
+			com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock title =
+					com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene.renderTextBlock( Messages.get( Legacy.class, "title" ), 9 );
+			title.hardlight( TITLE_COLOR );
+			title.setPos( (width - title.width())/2f, 0 );
+			add( title );
+
+			com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock info =
+					com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene.renderTextBlock(
+							Messages.get( Legacy.class, "desc", points(), earned ) + (altarBuilt() ? "\n" + Messages.get( Legacy.class, "altar_on" ) : ""), 6 );
+			info.maxWidth( width );
+			info.setPos( 0, title.bottom() + 2 );
+			add( info );
+
+			com.shatteredpixel.shatteredpixeldungeon.ui.ScrollingListPane list = new com.shatteredpixel.shatteredpixeldungeon.ui.ScrollingListPane();
+			add( list );
+			float top = info.bottom() + 3;
+			list.setRect( 0, top, width, height - top );
+			for (int g = 0; g < GROUPS.length; g++){
+				list.addTitle( Messages.get( Legacy.class, "group_" + g ) );
+				for (final Perk p : GROUPS[g]){
+					list.addItem( new com.shatteredpixel.shatteredpixeldungeon.ui.ScrollingListPane.ListItem(
+							com.shatteredpixel.shatteredpixeldungeon.ui.Icons.TALENT.get(),
+							Messages.get( Legacy.class, "entry", name( p ), level( p ), maxFor( p ) ) ){
+						@Override
+						public boolean onClick( float x, float y ) {
+							if (!inside( x, y )) return false;
+							hide();
+							detail( p );
+							return true;
+						}
+					} );
+				}
 			}
-			l[perks.length] = Messages.get( Legacy.class, "close" );
-			return l;
 		}
 
-		@Override
-		protected void onSelect( int index ) {
-			if (index >= perks.length) return;
-			final Perk p = perks[index];
-			boolean can = points() > 0 && level( p ) < p.max;
-			String text = desc( p ) + "\n\n" + Messages.get( Legacy.class, "level_line", level( p ), p.max, points() );
+		private static void detail( final Perk p ){
+			boolean can = points() > 0 && level( p ) < maxFor( p );
+			String text = desc( p ) + "\n\n" + Messages.get( Legacy.class, "level_line", level( p ), maxFor( p ), points() );
 			ShatteredPixelDungeon.scene().addToFront( new WndOptions( name( p ), text,
-					can ? Messages.get( Legacy.class, "buy" ) : Messages.get( Legacy.class, level( p ) >= p.max ? "maxed" : "no_points" ),
+					can ? Messages.get( Legacy.class, "buy" ) : Messages.get( Legacy.class, level( p ) >= maxFor( p ) ? "maxed" : "no_points" ),
 					Messages.get( Legacy.class, "back" ) ){
 				@Override
 				protected boolean enabled( int i ) {
-					return i != 0 || (points() > 0 && level( p ) < p.max);
+					return i != 0 || (points() > 0 && level( p ) < maxFor( p ));
 				}
 				@Override
 				protected void onSelect( int i ) {
@@ -230,6 +309,11 @@ public class Legacy {
 						Sample.INSTANCE.play( Assets.Sounds.LEVELUP );
 						GLog.p( Messages.get( Legacy.class, "bought", name( p ), level( p ) ) );
 					}
+					show();
+				}
+				@Override
+				public void onBackPressed() {
+					super.onBackPressed();
 					show();
 				}
 			} );

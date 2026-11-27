@@ -93,7 +93,7 @@ public class Hunger extends Buff implements Hero.Doom {
 				hungerDelay /= SaltCube.hungerGainMultiplier();
 
 				//EFPD: open world endurance slows hunger
-				float newLevel = level + (com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.hungerMultiplier()*com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.hungerMultiplier()/hungerDelay);
+				float newLevel = level + (com.shatteredpixel.shatteredpixeldungeon.efpd.PermStats.hungerMultiplier()*com.shatteredpixel.shatteredpixeldungeon.efpd.lab.Lab.hungerMultiplier()*com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.hungerMulti()/hungerDelay);
 				if (newLevel >= STARVING) {
 
 					GLog.n( Messages.get(this, "onstarving") );

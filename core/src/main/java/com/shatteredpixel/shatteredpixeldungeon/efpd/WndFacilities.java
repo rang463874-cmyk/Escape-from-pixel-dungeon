@@ -117,6 +117,7 @@ public class WndFacilities {
 		final SupplyPack pack = Dungeon.hero.belongings.getItem( SupplyPack.class );
 		b.add( pack != null ? msg( "pack_entry", pack.packLevel(), SupplyPack.MAX_LEVEL ) : msg( "pack_none" ),
 				pack != null, new Runnable() { public void run() { showPack( pack ); } } );
+		b.add( Messages.get(YendorWorks.class, "title"), true, new Runnable() { public void run() { YendorWorks.show(); } } );
 		b.add( msg( "back" ), true, new Runnable() { public void run() { GameScene.show( new WndBase() ); } } );
 		b.show( msg( "title" ), msg( "intro" ) + "\n\n" + Facilities.haveText() );
 	}

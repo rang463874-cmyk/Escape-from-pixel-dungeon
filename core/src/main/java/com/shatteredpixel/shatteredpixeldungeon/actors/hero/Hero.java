@@ -584,6 +584,7 @@ public class Hero extends Char {
 		accuracy *= Injuries.accuracyMultiplier(this);
 		//EFPD: open world skill
 		accuracy *= PermStats.accuracyMultiplier();
+		accuracy *= com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.accuracyMulti();
 
 		if (!RingOfForce.fightingUnarmed(this)) {
 			return Math.max(1, Math.round(attackSkill * accuracy * wep.accuracyFactor( this, target )));
@@ -632,6 +633,7 @@ public class Hero extends Char {
 		evasion *= Injuries.evasionMultiplier(this);
 		//EFPD: open world agility
 		evasion *= PermStats.evasionMultiplier();
+		evasion *= com.shatteredpixel.shatteredpixeldungeon.efpd.Legacy.evasionMulti();
 		//EFPD: dehydration makes the hero easier to hit
 		evasion *= Thirst.evasionMultiplier(this);
 
